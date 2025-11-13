@@ -5,7 +5,14 @@
     <title>SpeakTrace</title>
 </head>
 <body>
-    <h1>歡迎</h1>
-    <p>這是首頁。</p>
+    <div id="app">
+        <h1>{{ title }}</h1>
+        <p>{{ content }}</p>
+        <p>{{ content }}</p>
+        <p>{{ content }}</p>
+        <button @click="updateContent">改變內容</button>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="/js/main.js"></script>
 </body>
 </html>
