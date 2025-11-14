@@ -1,3 +1,41 @@
-# Abstract
+# SpeakTrace — 多人語音辨識平台
+一套支援 **多人語音分離、語音辨識、逐字稿產生與歷史紀錄查詢** 的網頁平台。  
+使用者可上傳會議、訪談或課堂錄影，系統將自動：
 
-本專題旨在開發一個可進行多人語音辨識的網站系統，使用者能夠上傳影片或音訊，系統將自動進行語音分離與辨識，生成對應的逐字稿與摘要文件。系統支援多位說話者同時出現的場景（如會議、訪談或課程錄影），並可自動區分不同發言者。使用者可透過帳號登入系統，瀏覽、查詢、下載過去的辨識記錄與文字檔。此網站結合了語音辨識（Speech-to-Text）、說話者分離（Speaker Diarization）、以及自然語言摘要（Text Summarization）等AI技術，提供方便的影音轉文字與知識整理服務，應用於教育、會議記錄、媒體轉錄等場域。
+1. 進行語音分離（Speaker Diarization）
+2. 語音轉文字（Speech-to-Text）
+3. 標示不同說話者
+4. 產生逐字稿與摘要文件
+5. 將紀錄儲存至資料庫，可隨時查詢下載
+
+---
+
+## 🚀 系統架構
+
+本專案採用 **前後端分離架構**：
+
+### 🟦 Frontend（前端）
+- Vue 3
+- Vue Router
+- Axios
+- Vite
+
+### 🟧 Backend（後端）
+- Spring Boot（Kotlin）
+- Spring Web / Validation / JPA
+- MySQL Connector
+- ModelMapper
+- Whisper + Pyannote（外部 AI 模型）
+
+### 🟩 Database（資料庫）
+- MySQL
+- ERD包含：
+  - `User`
+  - `Upload_Record`
+  - `Transcript`
+  - `Speaker_Info`
+
+---
+
+## 📁 專案資料夾結構
+
