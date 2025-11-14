@@ -1,41 +1,80 @@
-# SpeakTrace — 多人語音辨識平台
-一套支援 **多人語音分離、語音辨識、逐字稿產生與歷史紀錄查詢** 的網頁平台。  
-使用者可上傳會議、訪談或課堂錄影，系統將自動：
+# SpeakTrace – 多人語音辨識平台
 
-1. 進行語音分離（Speaker Diarization）
-2. 語音轉文字（Speech-to-Text）
-3. 標示不同說話者
-4. 產生逐字稿與摘要文件
-5. 將紀錄儲存至資料庫，可隨時查詢下載
+本專案為一套前後端分離的多人語音辨識網站，使用者可上傳影音檔並由系統自動執行語音分離、逐字稿產生與歷史紀錄查詢。
 
 ---
 
-## 🚀 系統架構
+## 📌 技術架構
 
-本專案採用 **前後端分離架構**：
-
-### 🟦 Frontend（前端）
-- Vue 3
-- Vue Router
-- Axios
-- Vite
-
-### 🟧 Backend（後端）
-- Spring Boot（Kotlin）
-- Spring Web / Validation / JPA
-- MySQL Connector
-- ModelMapper
-- Whisper + Pyannote（外部 AI 模型）
-
-### 🟩 Database（資料庫）
-- MySQL
-- ERD包含：
-  - `User`
-  - `Upload_Record`
-  - `Transcript`
-  - `Speaker_Info`
+- **Frontend：** Vue 3
+- **Backend：** Spring Boot（Kotlin）
+- **Database：** MySQL
+- **AI Models：** Whisper STT + Pyannote Speaker Diarization（外部服務或自建）
 
 ---
 
-## 📁 專案資料夾結構
+## 📁 專案結構
 
+```
+SpeakTrace/
+│
+├── backend/          # Kotlin + Spring Boot 後端
+├── frontend/         # Vue 3 前端
+└── database/         # MySQL 資料表與初始化腳本
+```
+
+---
+
+## 🚀 功能簡介
+
+- 上傳影片 / 音訊檔
+- Whisper 語音辨識
+- 說話者分離（Speaker Diarization）
+- 自動生成逐字稿
+- 歷史紀錄查詢與下載
+- 使用者登入/註冊（可選）
+
+---
+
+## 🔧 開發環境需求
+
+- Node.js 18+
+- JDK 17+
+- MySQL 8+
+- IntelliJ IDEA（後端）
+- VS Code（前端）
+
+---
+
+## ▶️ 啟動專案
+
+### 1. 啟動後端
+
+```bash
+cd backend
+./gradlew bootRun
+```
+
+### 2. 啟動前端
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## 📄 資料庫初始化
+
+```bash
+mysql -u root -p < database/create_tables.sql
+```
+
+---
+
+## 📬 聯絡
+
+若有問題可向開發者詢問：SpeakTrace 開發團隊
+
+email: **t112360221@ntut.org.tw**
