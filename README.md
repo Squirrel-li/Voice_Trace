@@ -1,3 +1,80 @@
-# Abstract
+# SpeakTrace – 多人語音辨識平台
 
-本專題旨在開發一個可進行多人語音辨識的網站系統，使用者能夠上傳影片或音訊，系統將自動進行語音分離與辨識，生成對應的逐字稿與摘要文件。系統支援多位說話者同時出現的場景（如會議、訪談或課程錄影），並可自動區分不同發言者。使用者可透過帳號登入系統，瀏覽、查詢、下載過去的辨識記錄與文字檔。此網站結合了語音辨識（Speech-to-Text）、說話者分離（Speaker Diarization）、以及自然語言摘要（Text Summarization）等AI技術，提供方便的影音轉文字與知識整理服務，應用於教育、會議記錄、媒體轉錄等場域。
+本專案為一套前後端分離的多人語音辨識網站，使用者可上傳影音檔並由系統自動執行語音分離、逐字稿產生與歷史紀錄查詢。
+
+---
+
+## 📌 技術架構
+
+- **Frontend：** Vue 3
+- **Backend：** Spring Boot（Kotlin）
+- **Database：** MySQL
+- **AI Models：** Whisper STT + Pyannote Speaker Diarization（外部服務或自建）
+
+---
+
+## 📁 專案結構
+
+```
+SpeakTrace/
+│
+├── backend/          # Kotlin + Spring Boot 後端
+├── frontend/         # Vue 3 前端
+└── database/         # MySQL 資料表與初始化腳本
+```
+
+---
+
+## 🚀 功能簡介
+
+- 上傳影片 / 音訊檔
+- Whisper 語音辨識
+- 說話者分離（Speaker Diarization）
+- 自動生成逐字稿
+- 歷史紀錄查詢與下載
+- 使用者登入/註冊（可選）
+
+---
+
+## 🔧 開發環境需求
+
+- Node.js 18+
+- JDK 17+
+- MySQL 8+
+- IntelliJ IDEA（後端）
+- VS Code（前端）
+
+---
+
+## ▶️ 啟動專案
+
+### 1. 啟動後端
+
+```bash
+cd backend
+./gradlew bootRun
+```
+
+### 2. 啟動前端
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+---
+
+## 📄 資料庫初始化
+
+```bash
+mysql -u root -p < database/create_tables.sql
+```
+
+---
+
+## 📬 聯絡
+
+若有問題可向開發者詢問：SpeakTrace 開發團隊
+
+email: **t112360221@ntut.org.tw**
