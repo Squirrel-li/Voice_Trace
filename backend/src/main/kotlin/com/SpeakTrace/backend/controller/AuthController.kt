@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.*
 class AuthController(
     private val authService: AuthService
 ) {
-    data class LoginRequest(val username: String, val password: String)
+    data class LoginRequest(val email: String, val password: String)
     data class SignupRequest(val username: String, val email: String, val password: String)
 
     @PostMapping("/login")
     fun login(@RequestBody body: LoginRequest): User? {
-        return authService.login(body.username, body.password)
+        return authService.login(body.email, body.password)
     }
 
     @PostMapping("/signup")

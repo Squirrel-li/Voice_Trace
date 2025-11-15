@@ -24,13 +24,27 @@ createApp({
                 this.messages.error = "請輸入帳密";
                 return;
             }
-            // TODO: call backend /api/auth/login
-            this.session.loggedIn = true;
-            this.session.token = "demo-token";
-            this.profileForm.email = this.loginForm.email;
-            this.profileForm.name = "使用者";
-            this.view = "library";
-            this.messages.success = "登入成功";
+            try {
+                // 呼叫後端 /api/auth/login
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        email: this.loginForm.email, // 如果後端用 email，這裡要填 email
+                        password: this.loginForm.password
+                    })
+                });
+                if (!res.ok) throw new Error("登入失敗");
+                const user = await res.json();
+                this.session.loggedIn = true;
+                this.session.token = "demo-token"; // 可改為後端回傳的 token
+                this.profileForm.email = user.email;
+                this.profileForm.name = user.username;
+                this.view = "library";
+                this.messages.success = "登入成功";
+            } catch (e) {
+                this.messages.error = "登入失敗";
+            }
         },
         async register() {
             this.resetMessages();
@@ -38,10 +52,24 @@ createApp({
                 this.messages.error = "兩次密碼不一致";
                 return;
             }
-            // TODO: call backend /api/auth/register
-            this.messages.success = "註冊成功，請登入";
-            this.view = "login";
-            this.loginForm.email = this.registerForm.email;
+            try {
+                // 呼叫後端 /api/auth/signup
+                const res = await fetch("/api/auth/signup", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: this.registerForm.name,
+                        email: this.registerForm.email,
+                        password: this.registerForm.password
+                    })
+                });
+                if (!res.ok) throw new Error("註冊失敗");
+                this.messages.success = "註冊成功，請登入";
+                this.view = "login";
+                this.loginForm.email = this.registerForm.email;
+            } catch (e) {
+                this.messages.error = "註冊失敗";
+            }
         },
         async updateProfile() {
             this.resetMessages();
