@@ -41,8 +41,7 @@ SpeakTrace/
 - Node.js 18+
 - JDK 17+
 - MySQL 8+
-- IntelliJ IDEA（後端）
-- VS Code（前端）
+- VS Code（後端/前端）
 
 ---
 
