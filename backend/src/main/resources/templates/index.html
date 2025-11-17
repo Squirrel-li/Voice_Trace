@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <title>test SQL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body>
+    <header>
+        <h1>test SQL</h1>
+    </header>
+    <main id="view_sql">
+        <p>顯示資料庫內容</p>
+        <button :class="showJsonBtn" data-endpoint="/api/test_sql/show/all">all</button>
+        <button :class="showJsonBtn" data-endpoint="/api/test_sql/show/user">user</button>
+        <button :class="showJsonBtn" data-endpoint="/api/test_sql/show/uploadRecord">uploadRecord</button>
+        <button :class="showJsonBtn" data-endpoint="/api/test_sql/show/transcript">transcript</button>
+        <button :class="showJsonBtn" data-endpoint="/api/test_sql/show/SpeakerInfo">SpeakerInfo</button>
+        <pre id="sql_json"></pre>
+    </main>
+
+    <script src="/js/test_sql.js"></script>
+</body>
+</html>

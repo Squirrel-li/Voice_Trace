@@ -29,6 +29,6 @@ data class UploadRecord(
     val status: RecordStatus = RecordStatus.PENDING,
 
     @OneToMany(mappedBy = "uploadRecord", cascade = [CascadeType.ALL], orphanRemoval = true)
-    //@JsonIgnore
+    @JsonIgnore
     var transcripts: MutableList<Transcript> = mutableListOf(),
 )
