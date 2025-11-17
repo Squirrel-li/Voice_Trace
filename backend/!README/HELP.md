@@ -41,6 +41,16 @@
 # 2. 特殊語法
 
 ## 2.1 使用 Token 存取受保護的 API
+在`backend\src\main\kotlin\com\SpeakTrace\backend\config\SecurityConfig.kt`中，設定哪些API需認證
+```
+.csrf { it.disable() }
+.authorizeHttpRequests {
+	it.requestMatchers("/api/test_sql/**").permitAll() // 不需要驗證的路徑
+	it.anyRequest().authenticated() // 其他路徑需要驗證
+}
+.addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter::class.java)
+```
+
 
 ```
 async need_token_protect_api() {
