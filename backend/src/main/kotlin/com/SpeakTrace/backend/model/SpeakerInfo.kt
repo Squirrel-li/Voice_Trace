@@ -18,8 +18,8 @@ data class SpeakerInfo(
     var transcripts: MutableList<Transcript> = mutableListOf(),
 
     @Column(nullable = false)
-    val speakerLabel: String,
+    var speakerLabel: String,
 
     @Column(nullable = true)
-    val displayName: String? = null
+    var displayName: String? = null
 )

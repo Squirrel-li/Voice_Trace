@@ -21,7 +21,7 @@ data class Transcript(
     var speakerInfo: SpeakerInfo,
 
     @Column(nullable = false)
-    val textContent: String,
+    var textContent: String,
 
     @Column(nullable = false)
     val startTime: Double,

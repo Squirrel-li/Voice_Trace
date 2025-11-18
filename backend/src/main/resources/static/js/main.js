@@ -47,7 +47,7 @@ createApp({
                 this.profileForm.name = successData.username;
                 this.view = "library";
                 this.messages.success = "登入成功";
-                localStorage.setItem("token", successData.token);
+                //localStorage.setItem("token", successData.token);
             } catch (e) {
                 this.messages.error = "伺服器錯誤，請稍後再試";
             }
@@ -79,9 +79,36 @@ createApp({
         },
         async updateProfile() {
             this.resetMessages();
-            // TODO: call backend /api/users/me
-            this.messages.success = "個人資料已更新";
-            this.profileForm.password = "";
+            if (!this.profileForm.name || !this.profileForm.email) {
+                this.messages.error = "名稱與電子郵件不可為空";
+                return;
+            }
+            try {
+                const res = await fetch("/api/upload/userinfo", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${this.session.token}`
+                    },
+                    body: JSON.stringify({
+                        email: this.profileForm.email,
+                        username: this.profileForm.name,
+                        password: this.profileForm.password
+                    })
+                });
+                if (!res.ok) {
+                    const res_text = await res.text();
+                    this.messages.error = res_text;
+                    return;
+                }
+                const res_json = await res.json();
+                const res_text = res_json.message;
+                this.session.token = res_json.token;
+                this.messages.success = res_text;
+                this.profileForm.password = "";
+            } catch (e) {
+                this.messages.error = e.message || "伺服器錯誤，請稍後再試";
+            }
         },
         handleFile(event) {
             const [file] = event.target.files ?? [];

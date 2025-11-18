@@ -17,7 +17,9 @@
 
 ### 1.2 規則
 1. 分支命名規則：
-   - 功能分支：`<行為>/<功能名稱>`，例如：`modify/login_logic`
+   - 修改功能分支：`modify/<功能名稱>`，例如：`modify/login_logic`
+   - 新增功能分支：`add/<功能名稱>`，例如：`add/signup_feature`
+   - 修正分支：`fix/<修正內容>`，例如：`fix/signup_bug`
 
 1. Commit 訊息規範：
    - 描述清楚變更內容。
@@ -44,7 +46,7 @@
 
 ### 2.1.1 後端設定
 在 `backend\src\main\kotlin\com\SpeakTrace\backend\config\SecurityConfig.kt`中，設定哪些API需認證
-```
+```kotlin
 .requestMatchers(
     "/index.html", "/", "/css/**", "/js/**", "/images/**", "/webjars/**"
 ).permitAll() // 靜態資源與首頁允許
@@ -54,7 +56,7 @@
 
 ### 2.1.2 前端使用
 在前端中使用API時，需在標頭中加入Token，例如：
-```
+```javaScript
 async need_token_protect_api() {
 	// 從 localStorage 取得 Token
     const token = localStorage.getItem("token"); 

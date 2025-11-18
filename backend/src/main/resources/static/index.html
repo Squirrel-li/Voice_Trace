@@ -79,6 +79,7 @@
                 <button type="submit">儲存變更</button>
             </form>
             <p class="success" v-if="messages.success">{{ messages.success }}</p>
+            <p class="error" v-if="messages.error">{{ messages.error }}</p>
         </section>
 
         <section v-else-if="view==='library'" class="card">
