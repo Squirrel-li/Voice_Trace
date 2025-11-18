@@ -53,7 +53,7 @@ class tranScriptionsController_show(
 
 @Profile("test_sql")
 @RestController
-@RequestMapping("/api/test_sql/show/SpeakerInfo")
+@RequestMapping("/api/test_sql/show/speakerInfo")
 class SpeakerinfosController_show(
     private val speakerInfoRepository: SpeakerInfoRepository
 ) {
