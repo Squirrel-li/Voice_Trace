@@ -35,6 +35,14 @@ object JwtUtil {
         }
     }
     
+    fun extractEmail(token: String): String {
+        val claims = Jwts.parser()
+            .setSigningKey(SECRET_KEY)
+            .parseClaimsJws(token)
+            .body
+        return claims.subject // 這裡的 subject 就是 email
+    }
+
     fun getAuthentication(email: String): UsernamePasswordAuthenticationToken {
         val userDetails = User(email, "", listOf(SimpleGrantedAuthority("USER")))
         return UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)

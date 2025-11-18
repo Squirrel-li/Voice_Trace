@@ -13,7 +13,7 @@ data class UploadRecord(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    var user: User,
+    val user: User,
 
     @Column(nullable = false)
     val fileName: String,
@@ -26,7 +26,7 @@ data class UploadRecord(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    val status: RecordStatus = RecordStatus.PENDING,
+    var status: RecordStatus = RecordStatus.PENDING,
 
     @OneToMany(mappedBy = "uploadRecord", cascade = [CascadeType.ALL], orphanRemoval = true)
     @JsonIgnore
