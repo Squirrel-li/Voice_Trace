@@ -25,25 +25,31 @@ createApp({
                 return;
             }
             try {
-                // 呼叫後端 /api/auth/login
                 const res = await fetch("/api/auth/login", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        email: this.loginForm.email, // 如果後端用 email，這裡要填 email
+                        email: this.loginForm.email,
                         password: this.loginForm.password
                     })
                 });
-                if (!res.ok) throw new Error("登入失敗");
-                const user = await res.json();
+                if (!res.ok) {
+                    // 如果回應不是 200，解析錯誤訊息
+                    const errorData = await res.json();
+                    this.messages.error = errorData.message;
+                    return;
+                }
+                
+                const successData = await res.json();
                 this.session.loggedIn = true;
-                this.session.token = "demo-token"; // 可改為後端回傳的 token
-                this.profileForm.email = user.email;
-                this.profileForm.name = user.username;
+                this.session.token = successData.token; // 使用後端回傳的 token
+                this.profileForm.email = successData.email;
+                this.profileForm.name = successData.username;
                 this.view = "library";
                 this.messages.success = "登入成功";
+                localStorage.setItem("token", successData.token);
             } catch (e) {
-                this.messages.error = "登入失敗";
+                this.messages.error = "伺服器錯誤，請稍後再試";
             }
         },
         async register() {

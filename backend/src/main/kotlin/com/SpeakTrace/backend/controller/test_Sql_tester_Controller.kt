@@ -42,7 +42,7 @@ class UploadRecordController_show(
 
 @Profile("test_sql")
 @RestController
-@RequestMapping("/api/test_sql/show/tranScription")
+@RequestMapping("/api/test_sql/show/transcript")
 class tranScriptionsController_show(
     private val transcriptRepository: TranscriptRepository
 ) {
@@ -53,7 +53,7 @@ class tranScriptionsController_show(
 
 @Profile("test_sql")
 @RestController
-@RequestMapping("/api/test_sql/show/Speakerinfo")
+@RequestMapping("/api/test_sql/show/speakerInfo")
 class SpeakerinfosController_show(
     private val speakerInfoRepository: SpeakerInfoRepository
 ) {
@@ -144,7 +144,7 @@ class TranscriptController_add(
     data class CreateTranscriptRequest(
         val uploadRecordId: Long,
         val speakerInfoId: Long?,
-        val content: String,
+        val textContent: String,
         val startTime: Double,
         val endTime: Double
     )
@@ -163,7 +163,7 @@ class TranscriptController_add(
             Transcript(
                 uploadRecord = uploadRecord,
                 speakerInfo = speakerInfo,
-                textContent = body.content,
+                textContent = body.textContent,
                 startTime = body.startTime,
                 endTime = body.endTime
             )
