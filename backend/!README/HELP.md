@@ -17,7 +17,8 @@
 
 ### 1.2 規則
 1. 分支命名規則：
-   - 修改功能分支：`modify/<功能名稱>`，例如：`modify/login_logic`
+   - 修改(調整)功能分支：`modify/<功能名稱>`，例如：`modify/login_logic`
+   - 修改(重作)功能分支：`remake/<功能名稱>`，例如：`remake/login_logic`
    - 新增功能分支：`add/<功能名稱>`，例如：`add/signup_feature`
    - 修正分支：`fix/<修正內容>`，例如：`fix/signup_bug`
 
