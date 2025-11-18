@@ -6,7 +6,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import com.SpeakTrace.backend.security.JwtAuthenticationFilter
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
@@ -17,11 +18,15 @@ class SecurityConfig(
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
-            .authorizeHttpRequests {
-                it.requestMatchers("/api/auth/**").permitAll() // 不需要驗證的路徑
-                it.anyRequest().authenticated() // 其他路徑需要驗證
+            .authorizeHttpRequests { 
+                it
+                    .requestMatchers(
+                        "/index.html", "/", "/css/**", "/js/**", "/images/**", "/webjars/**"
+                    ).permitAll() // 靜態資源與首頁允許
+                    .requestMatchers("/api/auth/**", "/api/test_sql/**").permitAll() // 公開API
+                    .anyRequest().authenticated() // 其他都要驗證
             }
-            .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }
 

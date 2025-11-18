@@ -43,11 +43,11 @@ createApp({
                 const successData = await res.json();
                 this.session.loggedIn = true;
                 this.session.token = successData.token; // 使用後端回傳的 token
-                localStorage.setItem("token", successData.token);
                 this.profileForm.email = successData.email;
                 this.profileForm.name = successData.username;
                 this.view = "library";
                 this.messages.success = "登入成功";
+                localStorage.setItem("token", successData.token);
             } catch (e) {
                 this.messages.error = "伺服器錯誤，請稍後再試";
             }
@@ -116,12 +116,6 @@ createApp({
         },
         remove(item) {
             this.library = this.library.filter(entry => entry.id !== item.id);
-        },
-        go_test() {
-            window.location.href = '/test_sql.html';
         }
     }
 }).mount("#app");
-
-
-
