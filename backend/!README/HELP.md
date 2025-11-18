@@ -16,12 +16,10 @@
 - `git push origin <branch>`：將本地端的變更推送到遠端儲存庫的指定分支。
 
 ### 1.2 規則
-
 1. 分支命名規則：
-
    - 功能分支：`<行為>/<功能名稱>`，例如：`modify/login_logic`
-2. Commit 訊息規範：
 
+1. Commit 訊息規範：
    - 描述清楚變更內容。
    - 範例：`add basic login & signup function`、`Add MIT License to the project`
 
