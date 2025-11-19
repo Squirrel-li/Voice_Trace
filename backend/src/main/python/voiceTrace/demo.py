@@ -5,7 +5,7 @@ import os
 print("path initialization")
 path_root = os.path.dirname(os.path.abspath(__file__))
 path_root = os.path.normpath(os.path.join(path_root, ".."))
-path_dir_audio = os.path.join(path_root, "audio_quality_testing_samples")
+path_dir_audio = os.path.join(path_root, "audio")
 path_file_audio = os.path.join(path_dir_audio, "testaudio", "8000", "test01_20s.wav")
 
 print("choosing device")
