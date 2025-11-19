@@ -20,6 +20,11 @@ pip install torch --index-url https://download.pytorch.org/whl/cu121
 pip install torch --index-url https://download.pytorch.org/whl/cpu
 ```
 
+1. 下載 ffmpeg
+```powerShell
+winget install Gyan.FFmpeg
+```
+
 ## 2. 常用函式
 
 ## 2.1 

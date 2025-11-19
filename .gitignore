@@ -44,3 +44,6 @@
 /backend/src/main/python/__pycache__/
 /backend/src/main/python/*.pyc
 .venv/
+
+### token file ###
+/backend/src/main/python/token.txt
