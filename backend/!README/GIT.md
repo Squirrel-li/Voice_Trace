@@ -39,18 +39,13 @@
 1. 從主分支 `main` 拉取
 
    ```bash
-
    git checkout main
-
    git pull origin main
-
    ```
 2. 建立新的分支
 
    ```bash
-
    git checkout -b <branch_name>
-
    ```
 
 ### 3.2 開發中
@@ -58,23 +53,24 @@
 1. 每次開始開發前，先從主分支拉取最新變更並合併到目前分支：
 
    ```bash
-
    git checkout main
-
    git pull origin main
-
    git checkout <branch_name>
-
    git merge main
-
    ```
 2. 完成部分功能後，在該分支中使用 `git add` 和 `git commit` 提交變更。
+
+1. 若在異地建立分之，請記得先拉取遠端分支：
+
+   ```bash
+   git fetch origin
+   git checkout -b <branch_name> origin/<branch_name>
+   ```
+
 3. 定期將變更推送到遠端儲存庫：
 
    ```bash
-
    git push origin <branch_name>
-
    ```
 4. 建立 Pull Request 選項使用 "Draft" 狀態，以表示工作尚未完成。
 
