@@ -69,3 +69,8 @@ async need_token_protect_api() {
 | ------ | -------------------- | -------------- |
 | POST   | /api/upload/userinfo | 更新使用者資訊 |
 | POST   | /api/upload/media    | 上傳媒體資料   |
+
+## 2.4 語音處理 API 列表
+| Method | Endpoint    | Description       |
+| ------ | ----------- | ----------------- |
+| POST   | /api/tts    | 語音轉文字處理    |
