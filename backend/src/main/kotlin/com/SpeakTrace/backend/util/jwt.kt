@@ -8,11 +8,22 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.stereotype.Component
 import java.util.*
+import java.util.Base64
+import java.io.File
 
 @Component
 object JwtUtil {
-    private val SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256) // 生成安全的密鑰
+    private val SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256)
     private const val EXPIRATION = 86400000 // 1天
+
+    init {
+        // 確保資料夾存在
+        val dir = File("secretKey")
+        if (!dir.exists()) dir.mkdirs()
+        // 存 base64 密鑰到檔案
+        val base64Key = Base64.getEncoder().encodeToString(SECRET_KEY.encoded)
+        File("secretKey/secret.key").writeText(base64Key)
+    }
 
     fun generateToken(email: String): String {
         return Jwts.builder()

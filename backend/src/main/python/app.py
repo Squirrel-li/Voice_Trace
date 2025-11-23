@@ -1,6 +1,9 @@
 from flask import Flask, request, render_template, jsonify
+import requests
 from voiceTrace.main import VoiceTrace
 import os
+import base64
+import jwt
 
 app = Flask(__name__)
 
@@ -9,28 +12,52 @@ def get_root_path():
     path_root = os.path.normpath(os.path.join(path_root, ".."))
     return path_root
 
+def notify_kotlin_backend(result_json):
+    url = "http://127.0.0.1:8080/api/speech/result"  # 請依你的 Kotlin 端口與路徑調整
+    payload = {"result": result_json}
+    try:
+        resp = requests.post(url, json=payload, timeout=10)
+        print("Kotlin 回應：", resp.text)
+    except Exception as e:
+        print("通知 Kotlin 失敗：", e)
+
+def load_secret_key():
+    with open("d:/!universitiy/3-1/ApplicationSoftwareDesignPractice/final_project/project_kotlin/backend/secret.key", "r") as f:
+        base64_key = f.read().strip()
+    return base64.b64decode(base64_key)
+
+SECRET_KEY = load_secret_key()
+
 @app.route("/api/tts", methods=["POST"])
 def TTS():
     data = request.get_json()
     print("收到的資料：", data)
     path_file_input = data.get("path_file_input", "")
-    path_file_token = "D:\\!universitiy\\3-1\\ApplicationSoftwareDesignPractice\\final_project\\project_kotlin\\backend\\token.txt"
     path_file_input = os.path.normpath(path_file_input)
-    path_file_token = os.path.normpath(path_file_token)
 
     print("<path_file_input>:", path_file_input)
     print("<path_file_token>:", path_file_token)
-    voice_trace = VoiceTrace(path_file_token)
     result_json = voice_trace(path_file_input)
 
     if result_json.get("results") is None:
-        return jsonify({"error": f"Audio file not found.{path_file_input}"}), 404
+        return jsonify({"status": "error", "message": f"Audio file not found.{path_file_input}"}), 404
 
     print("result_json:", result_json)
+    notify_kotlin_backend(result_json)
+    return jsonify({"status": "success", "message": "Notification sent to Kotlin backend"}), 200
 
-    return jsonify(result_json)
+def verify_token(token):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        email = payload.get("sub")
+        return email
+    except Exception as e:
+        print("JWT 驗證失敗：", e)
+        return None
 
-    
-
+path_file_token = "D:\\!universitiy\\3-1\\ApplicationSoftwareDesignPractice\\final_project\\project_kotlin\\backend\\token.txt"
+path_file_token = os.path.normpath(path_file_token)
+voice_trace = VoiceTrace(path_file_token)
 if __name__ == "__main__":
+    print("\n\n\nStarting Flask server on port 5000...")
     app.run(debug=True, port=5000)

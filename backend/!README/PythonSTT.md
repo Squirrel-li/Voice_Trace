@@ -17,6 +17,12 @@ pip install whisperx
 1. 下載 GPU 版 PyTorch (20系列以前)
 
 ```powerShell
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+1. 下載 GPU 版 PyTorch (20系列以前)
+
+```powerShell
 pip install torch --index-url https://download.pytorch.org/whl/cu118
 ```
 

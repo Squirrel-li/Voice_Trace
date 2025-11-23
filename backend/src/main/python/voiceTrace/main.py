@@ -92,6 +92,7 @@ class VoiceTrace:
 
     def load_models(self, model_name=modelName[2], compute_type="float32"):
         device = "cuda" if torch.cuda.is_available() else "cpu"
+        print(f"Using device: {device}")
         model = whisperx.load_model(model_name, device, compute_type=compute_type)
         return model, device
         

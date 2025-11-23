@@ -46,4 +46,8 @@
 .venv/
 
 ### token file ###
-/backend/src/main/python/token.txt
+/backend/token.txt
+/frontend/speaktrace-frontend/
+
+/frontend/speaktrace-frontend/node_modules/
+/backend/secretKey/secret.key
