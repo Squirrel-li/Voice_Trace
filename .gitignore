@@ -41,3 +41,6 @@
 /.kotlin
 
 .venv
+node_modules
+frontend/SpeakTrace_frontend/.vscode
+frontend/SpeakTrace_frontend/node_modules
