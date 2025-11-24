@@ -15,7 +15,7 @@
       </div>
       
       <button 
-        @click="startUpload" 
+        @click="startUpload"
         :disabled="!fileName" 
         class="submit-btn"
       >

@@ -1,78 +1,198 @@
 <template>
-  <main class="main-content-container">
-    <div class="intro-section">
-      <h2>多人語音辨識服務</h2>
-      <p>結合語音辨識、說話者分離與自然語言摘要的 AI 服務 [cite: 8]。</p>
-      <button 
-        @click="$emit('openUpload')" 
-        class="action-btn large primary"
-      >
-        開始上傳辨識
-      </button>
-    </div>
-
-    <section class="history-section">
-      <h3>我的辨識紀錄 (對應功能 F4)</h3>
-      <button @click="$emit('viewHistory')" class="action-btn">
-        查詢歷史紀錄
-      </button>
-      
-      <TranscriptList :items="recognitionHistory" />
-    </section>
-  </main>
+    <main class="layout">
+        <!--
+        <aside class="left-panel">
+            <section class="card">
+                <div class="section-label">快捷方式</div>
+                <div class="shortcut-item">
+                    <span class="shortcut-dot"></span>
+                    <span>最近的文件</span>
+                </div>
+                <div class="section-label section-label--spaced">資料夾</div>
+                <button class="folder-new">
+                   ➕ 新建資料夾
+                </button>
+            </section>
+        </aside>-->
+             
+        <section class="content-panel">
+            <div class="content-header">
+                <div class="content-header-left">
+                    <span class="icon">☰</span>
+                    <span>最近的文件</span>
+                </div>
+                <div class="content-header-right">
+                    <!--<button class="icon-btn" aria-label="搜尋" @click="openSearchModal">🔍</button>-->
+                    <button class="toolbar-btn" @click="$emit('openUpload')">⬆️ 上傳語音檔</button>
+                </div>
+            </div>
+                
+            
+            <section class="card file-list-card">
+                <div class="file-header-row">
+                <div class="file-col file-col-checkbox file-row-checkbox">
+                    <div class="header-action-wrapper">
+                    <input
+                      type="checkbox"
+                      id="select-all-checkbox"
+                      :checked="allSelected"
+                      @change="toggleSelectAll"
+                    >
+                    <button id="delete-trigger-btn" class="delete-trigger-btn">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    </div>
+                </div>
+                <div class="file-col file-col-name file-col-name-header">名稱</div>
+                <div class="file-col file-col-len">語言</div>
+                <div class="file-col file-col-status">狀態</div>
+                <div class="file-col file-col-more"></div>
+                </div>
+            
+                <table class="file-table">
+                    <tbody id="file-list-body">
+                        <tr v-for="file in props.uploadrecord" :key="file.id" class="file-row file-row-body">
+                            <td class="file-col file-col-checkbox file-row-checkbox" style="margin-left: 0.5%;">
+                                <input
+                                    type="checkbox"
+                                    class="file-checkbox"
+                                    :value="file.id"
+                                    v-model="selectedIds"
+                                >
+                                <div class="file-row-checkbox-spacer"></div>
+                            </td>
+                            <td class="file-col file-col-name file-row-name" style="margin-left: 0%; min-width: 40%;">
+                                <span class="file-row-name-text">{{ file.filename }}</span>
+                                <span v-if="file.time" class="file-row-name-date">| {{ file.time }}</span>
+                            </td>
+                            <!--<td class="file-col file-col-mode file-row-mode">
+                                <span class="file-row-mode-badge">
+                                    {{ file.mode || '語音轉文字' }}
+                                </span>
+                            </td>-->
+                            <td class="file-col file-col-len file-row-len" style="margin-left: 25%;">
+                                <span class="file-row-len-text">{{ file.language || '中文' }}</span>
+                            </td>
+                            <td class="file-col file-col-status file-row-status" style="margin-left: 0%;">
+                                <span class="file-row-status-dot"
+                                    :style="{ backgroundColor: file.statusColor || '#16a34a' }"></span>
+                                <span class="file-row-status-text">{{ file.status || '完成' }}</span>
+                            </td>
+                            <td class="file-col file-col-more file-row-more" style="position: relative;">
+                                <i
+                                    class="fas fa-ellipsis-h file-row-more-icon"
+                                    style="font-size: 20px;color: #717781; cursor: pointer;"
+                                    @click="openMenu(file.id)"
+                                ></i>
+                                <!-- 小選單 -->
+                                <div
+                                    v-if="activeMenuId === file.id"
+                                    class="dropdown-menu"
+                                    style="position: absolute; right: 0; top: 30px; background: #fff; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 24%; z-index: 10; min-width: 120px; padding: 8px 0;"
+                                >
+                                    <button v-if="file.status!=='完成'" class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
+                                        <i class="fas fa-download" style="margin-right: 8px; color: #374151; text-align: center;"> 轉錄</i>
+                                    </button>
+                                    <button v-else class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
+                                        <i class="fas fa-download" style="margin-right: 8px; color: #374151; text-align: center;"> 下載</i>
+                                    </button>
+                                    <button class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
+                                        <i class="fas fa-trash-alt" style="margin-right: 8px; color: #374151; text-align: center;"> 刪除</i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if="props.uploadrecord.length === 0">
+                            <td colspan="5" class="file-empty-row">
+                                未上傳檔案
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </section>
+    </main>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="../../style.css" />
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
-import TranscriptList from './TranscriptList.vue';
+import { defineProps, ref, onMounted, onBeforeUnmount, computed } from 'vue';
 
 const props = defineProps({
-  recognitionHistory: {
-    type: Array,
-    default: () => []
-  }
+    uploadrecord: {
+        type: Array,
+        default: () => []
+    }
 });
 
-const emit = defineEmits(['openUpload', 'viewHistory']);
+const activeMenuId = ref(null);
+const selectedIds = ref([]);
+
+// 全選 checkbox 狀態
+const allSelected = computed(() => 
+  props.uploadrecord.length > 0 &&
+  selectedIds.value.length === props.uploadrecord.length
+);
+
+// 點擊全選
+const toggleSelectAll = () => {
+  if (allSelected.value) {
+    selectedIds.value = [];
+  } else {
+    selectedIds.value = props.uploadrecord.map(file => file.id);
+  }
+};
+
+const openMenu = (id) => {
+  activeMenuId.value = activeMenuId.value === id ? null : id;
+};
+
+const closeMenu = () => {
+  activeMenuId.value = null;
+};
+
+// 點擊外部關閉選單
+const handleClickOutside = (event) => {
+  // 判斷點擊是否在選單或 ⋯ 按鈕上
+  if (
+    !event.target.closest('.file-row-more-icon') &&
+    !event.target.closest('.dropdown-menu')
+  ) {
+    closeMenu();
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
 
-<style scoped>
-.main-content-container {
-  max-width: 1000px;
-  margin: 20px auto;
-  padding: 20px;
-  text-align: left;
+<style >
+.card,
+.file-list-card {
+  overflow: visible;
 }
-.intro-section {
-  text-align: center;
-  padding: 40px;
-  background-color: white;
-  border-radius: 8px;
-  margin-bottom: 30px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.menu-btn {
+    color: #374151;
+    text-align: center;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    padding: 8px 16px;
+    margin: 5px 5px;
 }
-.action-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-top: 15px;
-  transition: background-color 0.3s;
-  background-color: #ccc;
-  color: #333;
+.menu-btn:hover {
+    background: #f5f6fa;
 }
-.action-btn.primary {
-  background-color: #3f51b5;
-  color: white;
-}
-.action-btn.large {
-  padding: 15px 30px;
-  font-size: 1.2em;
-}
-.history-section {
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.menu-divider {
+    height: 1px;
+    background: #eee;
+    margin: 4px 0;
 }
 </style>

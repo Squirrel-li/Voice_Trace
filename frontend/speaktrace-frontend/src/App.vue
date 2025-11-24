@@ -10,10 +10,10 @@ import HomeView from './views/HomeView.vue';
 <style>
 /* 基礎全域樣式，確保頁面佈局正常 */
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f7f6;
+  font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: #f5f6fa;
+  color: #1f2933;
 }
 #app {
   text-align: center;

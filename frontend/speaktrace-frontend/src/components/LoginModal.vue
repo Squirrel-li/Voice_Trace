@@ -59,7 +59,7 @@ const handleLogin = () => {
 .submit-btn {
   width: 100%;
   padding: 10px;
-  background-color: #3f51b5;
+  background-color: #1677ff;
   color: white;
   border: none;
   border-radius: 4px;
@@ -71,7 +71,7 @@ const handleLogin = () => {
   font-size: 0.9em;
 }
 .switch-link a {
-  color: #3f51b5;
+  color: #1677ff;
   text-decoration: none;
 }
 .close-btn {
