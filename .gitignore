@@ -40,6 +40,10 @@
 ### Kotlin ###
 /.kotlin
 
+**/token.txt
+**/api_key.txt
+*.key
+
 .venv
 node_modules
 frontend/SpeakTrace_frontend/.vscode
