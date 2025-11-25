@@ -22,7 +22,6 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue';
 
-// 定義組件接收的屬性
 const props = defineProps({
     isLoggedIn: {
         type: Boolean,
@@ -30,13 +29,11 @@ const props = defineProps({
     }
 });
 
-// 定義組件發出的事件
-const emit = defineEmits(['openLogin', 'openRegister', 'openUpload']);
+const emit = defineEmits(['openLogin', 'openRegister', 'openUpload', 'logout']);
 
 const logout = () => {
-    // 實際應用中應清除登入狀態和 token
     alert('登出成功 (模擬)');
-    emit('openLogin'); // 登出後導回登入畫面或主頁
+    emit('logout'); // 通知父組件要登出
 };
 </script>
 

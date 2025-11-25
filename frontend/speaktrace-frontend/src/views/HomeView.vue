@@ -4,6 +4,7 @@
       @open-login="openModal('login')"
       @open-register="openModal('register')"
       @open-upload="openModal('upload')"
+      @logout="isLoggedIn = false"
       :is-logged-in="isLoggedIn" 
     />
 
