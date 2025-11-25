@@ -47,7 +47,14 @@
 
 ### token file ###
 /backend/token.txt
-/frontend/speaktrace-frontend/
 
 /frontend/speaktrace-frontend/node_modules/
 /backend/secretKey/secret.key
+**/token.txt
+**/api_key.txt
+*.key
+
+.venv
+node_modules
+frontend/SpeakTrace_frontend/.vscode
+frontend/SpeakTrace_frontend/node_modules

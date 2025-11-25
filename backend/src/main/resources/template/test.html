@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>Transcribe Hub 儀表板</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/test.css" />
+</head>
+
+<body>
+  <div class="layout" id="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">CT</div>
+        <div>
+          <div class="brand-text-main">SpeakTrace</div>
+          <div class="brand-text-sub">AI 多人語音辨識平台</div>
+        </div>
+      </div>
+
+      <nav>
+        <div class="nav-section-title">主選單</div>
+        <ul class="nav-list">
+          <li><button class="nav-link" :class="{ active: view === 'dashboard' }" @click="switchView('dashboard')"><span class="icon">🏠</span>儀表板</button></li>
+          <li><button class="nav-link" :class="{ active: view === 'MyFiles' }" @click="switchView('MyFiles')"><span class="icon">📂</span>我的檔案</button></li>
+          <li><button class="nav-link" :class="{ active: view === 'projectSettings' }" @click="switchView('projectSettings')"><span class="icon">⚙️</span>專案設定</button></li>
+          <li><button class="nav-link" :class="{ active: view === 'LanguageSettings' }" @click="switchView('LanguageSettings')"><span class="icon">🌐</span>語言與模型</button></li>
+          <li><button class="nav-link" :class="{ active: view === 'accountSettings' }" @click="switchView('accountSettings')"><span class="icon">⚙️</span>帳戶設定</button></li>
+        </ul>
+
+        <div class="nav-section-title">其他</div>
+        <ul class="nav-list">
+          <li><button class="nav-link" @click="switchView('Help')"><span class="icon">❓</span>說明中心</button></li>
+          <li><button class="nav-link" @click="switchView('Newupdate')"><span class="icon">📣</span>最新更新</button></li>
+        </ul>
+      </nav>
+      <!-- 付費區域 
+      <div class="sidebar-footer">
+        <div class="plan-pill"><span>⚡</span>試用方案 · 3 天</div>
+        <div>還有 <strong>42 分鐘</strong>免費額度</div>
+        <button class="upgrade-link">升級到無限方案 ➜</button>
+      </div>
+      -->
+    </aside>
+
+    <main class="main">
+      <header class="main-header">
+        <div class="title-block">
+          <h1>歡迎回來，使用者 👋</h1>
+          <p>拖曳上傳音檔，或建立一個新的轉錄專案。</p>
+        </div>
+
+        <!--???
+        <div class="header-actions">
+          <button class="btn btn-outline">📜 使用教學</button>
+          <button class="btn btn-primary">⬆️ 上傳音檔</button>
+        </div>
+        -->
+      </header>
+
+      <section class="content-grid">
+        <section v-if="view === 'dashboard'" class="main-content">
+          <article class="card">
+
+            <!-- 上標題 -->
+            <div class="card-header">
+              <div>
+                <div class="card-title">快速開始轉錄</div>
+                <div class="card-sub">支援會議錄音、Podcast、課堂錄音與簡報音檔</div>
+              </div>
+              <div class="pill">支援 MP3 / WAV / MP4 / M4A</div>
+            </div>
+
+            <!-- 上傳區域 -->
+            <div class="upload-zone">
+              <div>
+                <div class="upload-main-title">拖曳檔案到此處，或點擊右側按鈕</div>
+                <p class="upload-main-sub">
+                  我們會自動偵測語言、分段說話者，並產生可編輯的逐字稿。
+                </p>
+
+                <div class="upload-hints">
+                  <span>會議記錄</span>
+                  <span>訪談逐字稿</span>
+                  <span>線上課程</span>
+                  <span>Podcast</span>
+                </div>
+              </div>
+
+              <div class="upload-actions">
+                <div class="upload-badge">
+                  <span class="upload-badge-dot"></span>
+                  <span>雲端 GPU 已就緒</span>
+                </div>
+                <button class="btn btn-outline">📁 選擇檔案</button>
+                <button class="btn btn-primary">➕ 建立新專案</button>
+              </div>
+            </div>
+
+            <!-- 最近上傳紀錄 -->
+            <div class="recent-list">
+              <div v-for="record in uploadRecordList" :key="record.filename" class="recent-row">
+                <div class="file-primary">
+                  <div class="file-name">{{ record.filename }}</div>
+                    <div class="file-meta">上傳時間：{{ record.uploadTime }}</div>
+                </div>
+                <div>{{ record.uploadTime }}</div>
+                <div>--:--:--</div>
+                <div 
+                  class="file-status-pill"
+                  :class="{
+                    'status-success': record.status === 'CONFIRMED',
+                    'status-processing': record.status === 'PENDING'
+                  }"
+                >
+                  <span v-if="record.status === 'CONFIRMED'">✔ 已完成</span>
+                  <span v-else-if="record.status === 'PENDING'">⏳ 處理中</span>
+                  <span v-else>{{ record.status }}</span>
+                </div>
+              </div>
+            </div>
+
+          </article>
+        </section>
+        
+        <section v-if="view === 'MyFiles'" class="main-content">
+          <p>我的檔案內容區域</p>
+        </section>
+
+        <section v-if="view === 'projectSettings'" class="main-content">
+          <p>專案設定內容區域</p>
+        </section>
+
+        
+        <section v-if="view === 'LanguageSettings'" class="main-content">
+          <p>語言與模型內容區域</p>
+        </section>
+
+        
+        <section v-if="view === 'Help'" class="main-content">
+          <p>說明中心內容區域</p>
+        </section>
+
+        
+        <section v-if="view === 'accountSettings'" class="main-content">
+          <p>帳戶設定內容區域</p>
+        </section>
+
+        
+        <section v-if="view === 'Newupdate'" class="main-content">
+          <p>帳戶設定內容區域</p>
+        </section>
+
+
+        <!-- 統計區域 -->
+        <aside class="stats-grid">
+		      <!--
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">使用額度</div>
+                <div class="card-sub">本月轉錄分鐘數</div>
+              </div>
+              <div class="pill">試用方案</div>
+            </div>
+            <div class="stat-main-number">42 / 100 分鐘</div>
+            <div class="meter"><div class="meter-fill"></div></div>
+          </article>
+		      -->
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">語言與模型</div>
+                <div class="card-sub">最近 10 個專案</div>
+              </div>
+              <div class="pill">自動偵測</div>
+            </div>
+
+            <ul class="mini-list">
+              <li v-for="language in usage.LanguageStatistics" :key="language.Language">
+                {{ language.Language }} · {{ ((language.NumOfFiles / usage.totalLanguageUsage) * 100).toFixed(0) }}%
+              </li>
+            </ul>
+          </article>
+        </aside>
+      </section>
+    </main>
+    
+  </div>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
