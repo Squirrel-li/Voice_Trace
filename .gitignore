@@ -46,13 +46,13 @@
 .venv/
 
 ### token file ###
-/backend/token.txt
+backend/token.txt
 
 /frontend/speaktrace-frontend/node_modules/
 /backend/secretKey/secret.key
 **/token.txt
 **/api_key.txt
-*.key
+/backend/secretKey/secret.key
 
 .venv
 node_modules
