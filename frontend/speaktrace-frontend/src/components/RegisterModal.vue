@@ -27,30 +27,30 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
-import axios from 'axios';
+  import { ref } from 'vue';
+  import axios from 'axios';
 
-const emit = defineEmits(['close', 'switchToLogin']);
+  const emit = defineEmits(['close', 'switchToLogin']);
 
-const username = ref('');
-const email = ref('');
-const password = ref('');
+  const username = ref('');
+  const email = ref('');
+  const password = ref('');
 
-const handleRegister = async () => {
-    console.log(username.value, email.value, password.value);
-    const result = await axios.post('/api/auth/signup', {
-      username: username.value,
-      email: email.value,
-      password: password.value,
-    })
-    .then(response => {
-      console.log('註冊成功:', response.data);
-      emit('switchToLogin'); // 註冊成功後，引導使用者去登入
-    })
-    .catch(error => {
-      alert(error.response?.data?.message || '註冊失敗，請稍後再試。');
-    });
-};
+  const handleRegister = async () => {
+      console.log(username.value, email.value, password.value);
+      const result = await axios.post('/api/auth/signup', {
+        username: username.value,
+        email: email.value,
+        password: password.value,
+      })
+      .then(response => {
+        console.log('註冊成功:', response.data);
+        emit('switchToLogin'); // 註冊成功後，引導使用者去登入
+      })
+      .catch(error => {
+        alert(error.response?.data?.message || '註冊失敗，請稍後再試。');
+      });
+  };
 </script>
 
 <style scoped>

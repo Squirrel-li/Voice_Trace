@@ -20,26 +20,26 @@ class UploadController(
 ) {
     @PostMapping("/userinfo")
     fun uploadUserInfo(
-		@RequestHeader("Authorization") authHeader: String,
-		@RequestBody userInfo: UserInfoRequest
-	): ResponseEntity<Any> {
-		return try {
-        	val token = authHeader.removePrefix("Bearer ").trim()
-        	val email = jwtUtil.extractEmail(token)
-			val updated = uploadService.processUserInfo(email, userInfo)
+        @RequestHeader("Authorization") authHeader: String,
+        @RequestBody userInfo: UserInfoRequest
+    ): ResponseEntity<Any> {
+        return try {
+            val token = authHeader.removePrefix("Bearer ").trim()
+            val email = jwtUtil.extractEmail(token)
+            val updated = uploadService.processUserInfo(email, userInfo)
             if (updated) {
                 ResponseEntity.ok(mapOf("message" to "使用者資料更新", "token" to jwtUtil.generateToken(userInfo.email)))
             } else {
-				ResponseEntity.badRequest().body("查無使用者")
+                ResponseEntity.badRequest().body("查無使用者")
             }
-		}
-		catch(e: Exception) {
-			e.message?.let {
-				return ResponseEntity.badRequest().body(it)
-			}
-			return ResponseEntity.badRequest().body("伺服器錯誤")
-		}
-  }
+        }
+        catch(e: Exception) {
+                e.message?.let {
+                return ResponseEntity.badRequest().body(it)
+            }
+            return ResponseEntity.badRequest().body("伺服器錯誤")
+        }
+    }
 }
 
 /* 

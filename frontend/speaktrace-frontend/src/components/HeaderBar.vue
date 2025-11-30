@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-    import { ref, onMounted, onBeforeUnmount, defineProps, defineEmits } from 'vue';
+    import { ref, onMounted, onBeforeUnmount} from 'vue';
     import AccountManagement from './AccountManagement.vue';
 
     const props = defineProps({

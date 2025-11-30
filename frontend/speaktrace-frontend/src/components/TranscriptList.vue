@@ -40,19 +40,18 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 
-const props = defineProps({
-  items: {
-    type: Array,
-    required: true
-  }
-});
+  const props = defineProps({
+    items: {
+      type: Array,
+      required: true
+    }
+  });
 
-const downloadTranscript = (item) => {
-  // 實際應用中，這會是 API 呼叫以下載 Word/txt 檔案 [cite: 81, 101]
-  alert(`正在為 ${item.filename} 準備下載連結... (模擬)`);
-};
+  const downloadTranscript = (item) => {
+    // 實際應用中，這會是 API 呼叫以下載 Word/txt 檔案 [cite: 81, 101]
+    alert(`正在為 ${item.filename} 準備下載連結... (模擬)`);
+  };
 </script>
 
 <style scoped>

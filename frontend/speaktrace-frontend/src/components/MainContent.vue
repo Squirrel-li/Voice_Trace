@@ -38,7 +38,7 @@
                       :checked="allSelected"
                       @change="toggleSelectAll"
                     >
-                    <button id="delete-trigger-btn" class="delete-trigger-btn">
+                    <button @click="deleteSelected()" id="delete-trigger-btn" class="delete-trigger-btn">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                     </div>
@@ -73,7 +73,7 @@
                                     :style="{ backgroundColor: file.statusColor || '#16a34a' }"></span>
                                 <span class="file-row-status-text">{{ file.status || '完成' }}</span>
                             </td>
-                            <td class="file-col file-col-more file-row-more" style="margin-right: 10px;">
+                            <td class="file-col file-col-more file-row-more" style="position: relative;">
                                 <i
                                     class="fas fa-ellipsis-h file-row-more-icon"
                                     style="font-size: 20px;color: #717781; cursor: pointer;"
@@ -101,61 +101,98 @@
 </template>
 
 <script setup>
-import { defineProps, ref, onMounted, onBeforeUnmount, computed } from 'vue';
-import actionMenu  from '../components/actionMenu.vue';
+    import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+    import actionMenu  from '../components/actionMenu.vue';
 
-const props = defineProps({
-    uploadrecord: {
-        type: Array,
-        default: () => []
+    const props = defineProps({
+        uploadrecord: {
+            type: Array,
+            default: () => []
+        }
+    });
+
+    const emit = defineEmits(['openUpload', 'flashHistory']);
+
+    const activeMenuId = ref(null);
+    const selectedIds = ref([]);
+
+    // 全選 checkbox 狀態
+    const allSelected = computed(() => 
+        props.uploadrecord.length > 0 &&
+        selectedIds.value.length === props.uploadrecord.length
+    );
+
+    // 點擊全選
+    const toggleSelectAll = () => {
+    if (allSelected.value) {
+        selectedIds.value = [];
+    } else {
+        selectedIds.value = props.uploadrecord.map(file => file.id);
     }
-});
+    };
 
-const emit = defineEmits(['openUpload', 'viewHistory']);
+    const deleteSelected = () => {
+        if (selectedIds.value.length === 0) {
+            alert('請先選擇要刪除的檔案');
+            return;
+        }
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('請先登入以刪除檔案');
+            return;
+        }
 
-const activeMenuId = ref(null);
-const selectedIds = ref([]);
+        fetch ('/api/record/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ 
+                ids:selectedIds.value 
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('刪除成功:', data);
+            emit('flashHistory');
+            selectedIds.value = [];
+        })
+        .catch(error => {
+            alert(error.message || '刪除失敗，請稍後再試。');
+        });
+    };
 
-// 全選 checkbox 狀態
-const allSelected = computed(() => 
-  props.uploadrecord.length > 0 &&
-  selectedIds.value.length === props.uploadrecord.length
-);
+    const openMenu = (id) => {
+        activeMenuId.value = activeMenuId.value === id ? null : id;
+    };
 
-// 點擊全選
-const toggleSelectAll = () => {
-  if (allSelected.value) {
-    selectedIds.value = [];
-  } else {
-    selectedIds.value = props.uploadrecord.map(file => file.id);
-  }
-};
+    const closeMenu = () => {
+        activeMenuId.value = null;
+    };
 
-const openMenu = (id) => {
-  activeMenuId.value = activeMenuId.value === id ? null : id;
-};
+    // 點擊外部關閉選單
+    const handleClickOutside = (event) => {
+        // 判斷點擊是否在選單或 ⋯ 按鈕上
+        if (
+            !event.target.closest('.file-row-more-icon') &&
+            !event.target.closest('.dropdown-menu')
+        ) {
+            closeMenu();
+        }
+    };
 
-const closeMenu = () => {
-  activeMenuId.value = null;
-};
-
-// 點擊外部關閉選單
-const handleClickOutside = (event) => {
-  // 判斷點擊是否在選單或 ⋯ 按鈕上
-  if (
-    !event.target.closest('.file-row-more-icon') &&
-    !event.target.closest('.dropdown-menu')
-  ) {
-    closeMenu();
-  }
-};
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
-});
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside);
-});
+    onMounted(() => {
+        document.addEventListener('click', handleClickOutside);
+    });
+        onBeforeUnmount(() => {
+        document.removeEventListener('click', handleClickOutside);
+    });
 </script>
 
 <style >

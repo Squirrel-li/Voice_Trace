@@ -4,13 +4,13 @@
             @open-login="openModal('login')"
             @open-register="openModal('register')"
             @open-upload-userinfo="openModal('uploadUserinfo')"
-            @update-logout="isLoggedIn = $event"
+            @update-logout="logout($event)"
             :is-logged-in="isLoggedIn" 
         />
 
         <MainContent 
             @open-upload="openModal('upload')"
-            @view-history="fetchHistory"
+            @flash-history="fetchHistory"
             :uploadrecord="uploadrecord"
         />
 
@@ -30,10 +30,11 @@
 
             <UploadModal 
                 v-if="activeModal === 'upload'" 
-                @close="closeModal" 
+                @close="closeModal"
+                @upload-success="fetchHistory"
                 :uploadrecord="uploadrecord"
             />
-            <UploadUserinfo
+            <UploadUserinfoModal
                 v-if="activeModal === 'uploadUserinfo'"
                 @close="closeModal"
             />
@@ -49,7 +50,7 @@
     import LoginModal from '../components/LoginModal.vue';
     import RegisterModal from '../components/RegisterModal.vue';
     import UploadModal from '../components/UploadModal.vue';
-    import UploadUserinfo from '../components/UploadUserinfo.vue';
+    import UploadUserinfoModal from '../components/UploadUserinfoModal.vue';
 
     // 狀態管理
     const isLoggedIn = ref(false); // 模擬登入狀態
@@ -71,16 +72,38 @@
     // 登入成功處理
     const handleLoginSuccess = () => {
         isLoggedIn.value = true;
+        fetchHistory();
         closeModal();
     };
 
-    // 模擬查詢歷史紀錄 (對應功能 F4)
+    const logout = () => {
+        isLoggedIn.value = false;
+        clearHistory();
+    };
+
+    const clearHistory = () => {
+        uploadrecord.value = [];
+    };
     const fetchHistory = () => {
-        // 這裡應是 API 呼叫，目前為模擬數據
-        uploadrecord.value = [
-            { id: 1, filename: '會議記錄001.mp4', time: '2025-11-20 10:00', language: '中文', status: '完成' },
-            { id: 2, filename: '訪談錄音.wav', time: '2025-11-19 15:30', language: '中文', status: '處理中' },
-        ];
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('請先登入以查看歷史紀錄');
+            return;
+        }
+
+        fetch('/api/record/list', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            uploadrecord.value = data;
+        })
+        .catch(error => {
+            console.error('Error fetching history:', error);
+        });
     };
 </script>
 

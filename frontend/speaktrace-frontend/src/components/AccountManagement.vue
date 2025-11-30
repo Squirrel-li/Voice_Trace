@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-    import { ref, onMounted, onBeforeUnmount, defineProps, defineEmits } from 'vue';
+    import { ref, onMounted, onBeforeUnmount} from 'vue';
 	const props = defineProps({
 		isLoggedIn: {
 			type: Boolean,
