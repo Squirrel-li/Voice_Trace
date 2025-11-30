@@ -65,41 +65,25 @@
                                 <span class="file-row-name-text">{{ file.filename }}</span>
                                 <span v-if="file.time" class="file-row-name-date">| {{ file.time }}</span>
                             </td>
-                            <!--<td class="file-col file-col-mode file-row-mode">
-                                <span class="file-row-mode-badge">
-                                    {{ file.mode || '語音轉文字' }}
-                                </span>
-                            </td>-->
-                            <td class="file-col file-col-len file-row-len" style="margin-left: 25%;">
+                            <td class="file-col file-col-len file-row-len" style="margin-left: 10px;">
                                 <span class="file-row-len-text">{{ file.language || '中文' }}</span>
                             </td>
-                            <td class="file-col file-col-status file-row-status" style="margin-left: 0%;">
+                            <td class="file-col file-col-status file-row-status" style="margin-right: -40px;">
                                 <span class="file-row-status-dot"
                                     :style="{ backgroundColor: file.statusColor || '#16a34a' }"></span>
                                 <span class="file-row-status-text">{{ file.status || '完成' }}</span>
                             </td>
-                            <td class="file-col file-col-more file-row-more" style="position: relative;">
+                            <td class="file-col file-col-more file-row-more" style="margin-right: 10px;">
                                 <i
                                     class="fas fa-ellipsis-h file-row-more-icon"
                                     style="font-size: 20px;color: #717781; cursor: pointer;"
                                     @click="openMenu(file.id)"
                                 ></i>
                                 <!-- 小選單 -->
-                                <div
+                                <actionMenu 
                                     v-if="activeMenuId === file.id"
-                                    class="dropdown-menu"
-                                    style="position: absolute; right: 0; top: 30px; background: #fff; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 24%; z-index: 10; min-width: 120px; padding: 8px 0;"
-                                >
-                                    <button v-if="file.status!=='完成'" class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
-                                        <i class="fas fa-download" style="margin-right: 8px; color: #374151; text-align: center;"> 轉錄</i>
-                                    </button>
-                                    <button v-else class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
-                                        <i class="fas fa-download" style="margin-right: 8px; color: #374151; text-align: center;"> 下載</i>
-                                    </button>
-                                    <button class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
-                                        <i class="fas fa-trash-alt" style="margin-right: 8px; color: #374151; text-align: center;"> 刪除</i>
-                                    </button>
-                                </div>
+                                    :file="file"
+                                />
                             </td>
                         </tr>
                         <tr v-if="props.uploadrecord.length === 0">
@@ -118,6 +102,7 @@
 
 <script setup>
 import { defineProps, ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import actionMenu  from '../components/actionMenu.vue';
 
 const props = defineProps({
     uploadrecord: {
@@ -125,6 +110,8 @@ const props = defineProps({
         default: () => []
     }
 });
+
+const emit = defineEmits(['openUpload', 'viewHistory']);
 
 const activeMenuId = ref(null);
 const selectedIds = ref([]);

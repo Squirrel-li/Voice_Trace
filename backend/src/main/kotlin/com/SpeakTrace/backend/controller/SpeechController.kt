@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
+
 @RestController
 @RequestMapping("/api/speech")
 class SpeechController {
