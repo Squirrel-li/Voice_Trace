@@ -10,6 +10,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.LocalDateTime
+import com.SpeakTrace.backend.model.RecordStatus
 
 @Service
 class RecordService(
@@ -91,5 +92,27 @@ class RecordService(
 
         // 從資料庫中刪除記錄
         uploadRecordRepository.deleteAll(records)
+    }
+
+    fun getRecordFile(recordId: Long, email: String): File {
+        // 查詢 UploadRecord
+        val uploadRecord = uploadRecordRepository.findByIdAndUserEmail(recordId, email)
+            ?: throw IllegalArgumentException("找不到對應的 UploadRecord，recordId: $recordId，email: $email")
+        if (uploadRecord.status != RecordStatus.COMPLETED) {
+            throw IllegalStateException("上傳記錄的狀態不是 COMPLETED，無法下載檔案")
+        }
+        println("uploadRecord: $uploadRecord")
+        // 獲取檔案路徑
+        val filePath = uploadRecord.filePath
+        val fileName = filePath.toString().split(".").first() + ".txt"
+        println("fileName: $fileName")
+        val file = File(fileName)
+
+        // 檢查檔案是否存在
+        if (!file.exists()) {
+            throw IllegalArgumentException("檔案不存在，路徑: ${file.absolutePath}")
+        }
+
+        return file
     }
 }

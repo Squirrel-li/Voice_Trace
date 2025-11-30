@@ -13,6 +13,7 @@ data class UploadRecord(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore // 避免序列化時進入遞迴
     val user: User,
 
     @Column(nullable = false)
@@ -20,15 +21,15 @@ data class UploadRecord(
 
     @Column(nullable = false)
     val filePath: String,
-	
+
     @Column(nullable = false)
     val uploadedAt: LocalDateTime = LocalDateTime.now(),
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    var status: RecordStatus = RecordStatus.PENDING,
-
-    @OneToMany(mappedBy = "uploadRecord", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JsonIgnore
-    var transcripts: MutableList<Transcript> = mutableListOf(),
-)
+    var status: RecordStatus = RecordStatus.PENDING
+) {
+    override fun toString(): String {
+        return "UploadRecord(id=$id, fileName='$fileName', filePath='$filePath', uploadedAt=$uploadedAt, status=$status)"
+    }
+}

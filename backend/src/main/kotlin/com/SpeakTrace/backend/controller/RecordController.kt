@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.multipart.MultipartFile
 import com.SpeakTrace.backend.util.JwtUtil
 import com.SpeakTrace.backend.service.RecordService
+import com.SpeakTrace.backend.repository.UploadRecordRepository
 
 data class DeleteRecordsRequest(
     val ids: List<Long>
@@ -71,6 +72,32 @@ class RecordController(
 			recordService.deleteRecords(request.ids, email)
 
 			ResponseEntity.ok(mapOf("message" to "記錄已刪除"))
+		} catch (e: Exception) {
+			ResponseEntity.badRequest().body(mapOf("error" to e.message))
+		}
+	}
+
+	@GetMapping("/download")
+	fun downloadRecord(
+		@RequestParam id: Long, // 從請求參數中獲取檔案 ID
+		@RequestHeader("Authorization") authHeader: String // 從標頭中獲取 JWT Token
+	): ResponseEntity<Any> {
+    	return try {
+        // 從標頭中提取用戶的 email
+        val token = authHeader.removePrefix("Bearer ").trim()
+        val email = jwtUtil.extractEmail(token)
+
+        // 調用服務層獲取檔案
+		println("下載請求的檔案 ID: $id, 用戶 Email: $email")
+        val file = recordService.getRecordFile(id, email)
+
+        // 構建下載回應
+        val resource = file.inputStream().readBytes()
+        val fileName = file.name
+
+        ResponseEntity.ok()
+            .header("Content-Disposition", "attachment; filename=\"$fileName\"")
+            .body(resource)
 		} catch (e: Exception) {
 			ResponseEntity.badRequest().body(mapOf("error" to e.message))
 		}
