@@ -23,18 +23,30 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref } from 'vue';
+import axios from 'axios';
 
 const emit = defineEmits(['close', 'loginSuccess', 'switchToRegister']);
 
 const email = ref('');
 const password = ref('');
 
-const handleLogin = () => {
-  // 這裡僅處理畫面，實際登入邏輯應呼叫後端 API
-  console.log('嘗試登入:', email.value);
-  alert(`登入中... (模擬成功)`);
-  emit('loginSuccess'); // 模擬登入成功，關閉彈窗並更新 HomeView 狀態
+const handleLogin = async () => {
+  console.log(email.value, password.value);
+  
+  axios.post('/api/auth/login', {
+    email: email.value,
+    password: password.value,
+  })
+  .then(response => {
+    console.log('登入成功:', response.data);
+    localStorage.setItem('token', response.data.token);
+    emit('loginSuccess', response.data); // 登入成功通知父層
+  })
+  .catch(error => {
+    console.log('登入失敗:', error.response?.data);
+    alert(error.response?.data?.message || '登入失敗，請檢查您的帳號密碼。');
+  });
 };
 </script>
 

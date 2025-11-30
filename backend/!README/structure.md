@@ -4,13 +4,12 @@
 
 | 資料夾                   | 用途                       |
 | ------------------------ | -------------------------- |
-| **controller**     | 接 API，把請求交給 service  |
-| **service**        | 後端核心邏輯                |
-| **repository**     | 操作 MySQL                 |
-| **model**          | JPA entity，資料表欄位      |
-| **config**         | 系統設定（CORS、安全性等）   |
-| **Application.kt** | Spring Boot 啟動入口        |
-
+| **controller**           | 接 API，把請求交給 service |
+| **service**              | 後端核心邏輯               |
+| **repository**           | 操作 MySQL                 |
+| **model**                | JPA entity，資料表欄位     |
+| **config**               | 系統設定（CORS、安全性等） |
+| **Application.kt**       | Spring Boot 啟動入口       |
 ---
 
 ## 2. 各分類預期檔案及功能

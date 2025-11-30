@@ -7,8 +7,7 @@ import com.SpeakTrace.backend.util.JwtUtil
 import org.springframework.http.ResponseEntity
 import com.SpeakTrace.backend.repository.UserRepository
 
-
-
+@CrossOrigin(origins = ["http://localhost:5173"])
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(

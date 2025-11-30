@@ -35,8 +35,15 @@ class UploadService(
 			{
 				user.password = passwordEncoder.encode(userInfo.password)
 			}
-			user.username = userInfo.username
-            user.email = userInfo.email
+			
+			if (!userInfo.username.isBlank())
+			{
+				user.username = userInfo.username
+			}
+			if (!userInfo.email.isBlank())
+			{
+            	user.email = userInfo.email
+			}
 			userRepository.save(user)
 			return true
 		}

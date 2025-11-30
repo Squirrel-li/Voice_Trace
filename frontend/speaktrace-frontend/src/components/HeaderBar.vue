@@ -1,40 +1,64 @@
 <template>
     <header class="header">
         <h1>🎧 SpeakTrace 多人語音辨識平台</h1>
-        <div class="topbar-right">
-            <button 
-                v-if="!isLoggedIn" 
-                @click="$emit('openLogin')"
-                class="auth-btn"
-            >登入</button>
-            <button 
-                v-if="!isLoggedIn" 
-                @click="$emit('openRegister')"
-                class="auth-btn auth-btn--primary"
-            >註冊</button>
-            <div v-else class="logged-in-controls">
-            <button @click="logout" class="auth-btn">登出</button>
-            </div>
-        </div>
+        
+        <button @click.stop="openAccountManagement" class="gear-btn topbar-right">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+        <AccountManagement
+            v-if="showAccount"
+            class="account-management"
+            :is-logged-in="isLoggedIn"
+            @openLogin="$emit('openLogin')"
+            @openRegister="$emit('openRegister')"
+            @openUploadUserinfo="$emit('openUploadUserinfo')"
+            @updateLogout="$emit('updateLogout', $event)"
+        />
     </header>
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+    import { ref, onMounted, onBeforeUnmount} from 'vue';
+    import AccountManagement from './AccountManagement.vue';
 
-const props = defineProps({
-    isLoggedIn: {
-        type: Boolean,
-        required: true
-    }
-});
+    const props = defineProps({
+        isLoggedIn: {
+            type: Boolean,
+            required: true
+        }
+    });
+    const emit = defineEmits([
+        'openLogin', 
+        'openRegister', 
+        'openUploadUserinfo', 
+        'updateLogout'
+    ]);
 
-const emit = defineEmits(['openLogin', 'openRegister', 'openUpload', 'logout']);
+    const showAccount = ref(false);
 
-const logout = () => {
-    alert('登出成功 (模擬)');
-    emit('logout'); // 通知父組件要登出
-};
+    const openAccountManagement = () => {
+        showAccount.value = true;
+    };
+    const closeAccountManagement = () => {
+        showAccount.value = false;
+    };
+
+    // 點擊外部關閉
+    const handleClickOutside = (event) => {
+        if (
+            !event.target.closest('.topbar-right') &&
+            !event.target.closest('.account-management')
+        ) {
+            closeAccountManagement();
+        }
+    };
+
+    onMounted(() => {
+        document.addEventListener('click', handleClickOutside);
+    });
+    onBeforeUnmount(() => {
+        document.removeEventListener('click', handleClickOutside);
+    });
 </script>
 
 <style scoped>
@@ -72,5 +96,17 @@ h1 {
 }
 .nav-btn:hover {
     opacity: 0.8;
+}
+.gear-btn {
+    background-color: #1677ff; /* 你想要的底色 */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.gear-btn:hover {
+    background-color: #145cc4; /* hover 時的底色 */
 }
 </style>

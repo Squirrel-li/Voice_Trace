@@ -38,7 +38,7 @@
                       :checked="allSelected"
                       @change="toggleSelectAll"
                     >
-                    <button id="delete-trigger-btn" class="delete-trigger-btn">
+                    <button @click="deleteSelected()" id="delete-trigger-btn" class="delete-trigger-btn">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                     </div>
@@ -65,15 +65,10 @@
                                 <span class="file-row-name-text">{{ file.filename }}</span>
                                 <span v-if="file.time" class="file-row-name-date">| {{ file.time }}</span>
                             </td>
-                            <!--<td class="file-col file-col-mode file-row-mode">
-                                <span class="file-row-mode-badge">
-                                    {{ file.mode || '語音轉文字' }}
-                                </span>
-                            </td>-->
-                            <td class="file-col file-col-len file-row-len" style="margin-left: 25%;">
+                            <td class="file-col file-col-len file-row-len" style="margin-left: 10px;">
                                 <span class="file-row-len-text">{{ file.language || '中文' }}</span>
                             </td>
-                            <td class="file-col file-col-status file-row-status" style="margin-left: 0%;">
+                            <td class="file-col file-col-status file-row-status" style="margin-right: -40px;">
                                 <span class="file-row-status-dot"
                                     :style="{ backgroundColor: file.statusColor || '#16a34a' }"></span>
                                 <span class="file-row-status-text">{{ file.status || '完成' }}</span>
@@ -85,21 +80,10 @@
                                     @click="openMenu(file.id)"
                                 ></i>
                                 <!-- 小選單 -->
-                                <div
+                                <actionMenu 
                                     v-if="activeMenuId === file.id"
-                                    class="dropdown-menu"
-                                    style="position: absolute; right: 0; top: 30px; background: #fff; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 24%; z-index: 10; min-width: 120px; padding: 8px 0;"
-                                >
-                                    <button v-if="file.status!=='完成'" class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
-                                        <i class="fas fa-download" style="margin-right: 8px; color: #374151; text-align: center;"> 轉錄</i>
-                                    </button>
-                                    <button v-else class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
-                                        <i class="fas fa-download" style="margin-right: 8px; color: #374151; text-align: center;"> 下載</i>
-                                    </button>
-                                    <button class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
-                                        <i class="fas fa-trash-alt" style="margin-right: 8px; color: #374151; text-align: center;"> 刪除</i>
-                                    </button>
-                                </div>
+                                    :file="file"
+                                />
                             </td>
                         </tr>
                         <tr v-if="props.uploadrecord.length === 0">
@@ -117,58 +101,98 @@
 </template>
 
 <script setup>
-import { defineProps, ref, onMounted, onBeforeUnmount, computed } from 'vue';
+    import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+    import actionMenu  from '../components/actionMenu.vue';
 
-const props = defineProps({
-    uploadrecord: {
-        type: Array,
-        default: () => []
+    const props = defineProps({
+        uploadrecord: {
+            type: Array,
+            default: () => []
+        }
+    });
+
+    const emit = defineEmits(['openUpload', 'flashHistory']);
+
+    const activeMenuId = ref(null);
+    const selectedIds = ref([]);
+
+    // 全選 checkbox 狀態
+    const allSelected = computed(() => 
+        props.uploadrecord.length > 0 &&
+        selectedIds.value.length === props.uploadrecord.length
+    );
+
+    // 點擊全選
+    const toggleSelectAll = () => {
+    if (allSelected.value) {
+        selectedIds.value = [];
+    } else {
+        selectedIds.value = props.uploadrecord.map(file => file.id);
     }
-});
+    };
 
-const activeMenuId = ref(null);
-const selectedIds = ref([]);
+    const deleteSelected = () => {
+        if (selectedIds.value.length === 0) {
+            alert('請先選擇要刪除的檔案');
+            return;
+        }
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('請先登入以刪除檔案');
+            return;
+        }
 
-// 全選 checkbox 狀態
-const allSelected = computed(() => 
-  props.uploadrecord.length > 0 &&
-  selectedIds.value.length === props.uploadrecord.length
-);
+        fetch ('/api/record/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ 
+                ids:selectedIds.value 
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('刪除成功:', data);
+            emit('flashHistory');
+            selectedIds.value = [];
+        })
+        .catch(error => {
+            alert(error.message || '刪除失敗，請稍後再試。');
+        });
+    };
 
-// 點擊全選
-const toggleSelectAll = () => {
-  if (allSelected.value) {
-    selectedIds.value = [];
-  } else {
-    selectedIds.value = props.uploadrecord.map(file => file.id);
-  }
-};
+    const openMenu = (id) => {
+        activeMenuId.value = activeMenuId.value === id ? null : id;
+    };
 
-const openMenu = (id) => {
-  activeMenuId.value = activeMenuId.value === id ? null : id;
-};
+    const closeMenu = () => {
+        activeMenuId.value = null;
+    };
 
-const closeMenu = () => {
-  activeMenuId.value = null;
-};
+    // 點擊外部關閉選單
+    const handleClickOutside = (event) => {
+        // 判斷點擊是否在選單或 ⋯ 按鈕上
+        if (
+            !event.target.closest('.file-row-more-icon') &&
+            !event.target.closest('.dropdown-menu')
+        ) {
+            closeMenu();
+        }
+    };
 
-// 點擊外部關閉選單
-const handleClickOutside = (event) => {
-  // 判斷點擊是否在選單或 ⋯ 按鈕上
-  if (
-    !event.target.closest('.file-row-more-icon') &&
-    !event.target.closest('.dropdown-menu')
-  ) {
-    closeMenu();
-  }
-};
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
-});
-onBeforeUnmount(() => {
-  document.removeEventListener('click', handleClickOutside);
-});
+    onMounted(() => {
+        document.addEventListener('click', handleClickOutside);
+    });
+        onBeforeUnmount(() => {
+        document.removeEventListener('click', handleClickOutside);
+    });
 </script>
 
 <style >

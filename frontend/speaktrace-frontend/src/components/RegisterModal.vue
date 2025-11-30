@@ -27,20 +27,30 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
+  import { ref } from 'vue';
+  import axios from 'axios';
 
-const emit = defineEmits(['close', 'switchToLogin']);
+  const emit = defineEmits(['close', 'switchToLogin']);
 
-const username = ref('');
-const email = ref('');
-const password = ref('');
+  const username = ref('');
+  const email = ref('');
+  const password = ref('');
 
-const handleRegister = () => {
-  // 這裡僅處理畫面，實際註冊邏輯應呼叫後端 API，並觸發信箱驗證 [cite: 63]
-  console.log('嘗試註冊:', username.value, email.value);
-  alert(`註冊中... (模擬成功，需進行信箱驗證)`); 
-  emit('switchToLogin'); // 註冊成功後，引導使用者去登入
-};
+  const handleRegister = async () => {
+      console.log(username.value, email.value, password.value);
+      const result = await axios.post('/api/auth/signup', {
+        username: username.value,
+        email: email.value,
+        password: password.value,
+      })
+      .then(response => {
+        console.log('註冊成功:', response.data);
+        emit('switchToLogin'); // 註冊成功後，引導使用者去登入
+      })
+      .catch(error => {
+        alert(error.response?.data?.message || '註冊失敗，請稍後再試。');
+      });
+  };
 </script>
 
 <style scoped>

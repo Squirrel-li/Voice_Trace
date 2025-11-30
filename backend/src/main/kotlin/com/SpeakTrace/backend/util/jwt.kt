@@ -42,7 +42,7 @@ object JwtUtil {
                 .body
                 .subject
         } catch (e: Exception) {
-            null
+            e.message
         }
     }
     
