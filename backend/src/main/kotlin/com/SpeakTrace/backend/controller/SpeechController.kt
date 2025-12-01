@@ -22,7 +22,7 @@ class SpeechController(
     fun tts(
         @RequestHeader("Authorization") authHeader: String,
         @RequestBody request: UploadRecordRequest
-    ): ResponseEntity<String> {
+    ): ResponseEntity<Map<String, String>> {
         try {
             val uploadRecordId = request.id
             val token = authHeader.removePrefix("Bearer ").trim()
@@ -33,12 +33,11 @@ class SpeechController(
             CoroutineScope(Dispatchers.IO).launch {
                 speechProcessingService.callSpeechApi(email, uploadRecordId)
             }
+    		return ResponseEntity.ok(mapOf("message" to "TTS 請求已發送"))
 
         } catch (e: Exception) {
-            return ResponseEntity.badRequest().body("發生錯誤: ${e.message}")
+            return ResponseEntity.badRequest().body(mapOf("error" to "發生錯誤: ${e.message}"))
         }
-
-        return ResponseEntity.ok("TTS 請求已發送")
     }
 
     @PostMapping("/result")

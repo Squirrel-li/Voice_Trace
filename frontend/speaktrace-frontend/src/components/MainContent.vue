@@ -120,6 +120,7 @@
     const selectedIds = ref([]);
 
     const transcribe = (id) => {
+        closeMenu();
         const token = localStorage.getItem('token');
         if (!token) {
             alert('請先登入以進行轉錄');
@@ -168,6 +169,7 @@
     };
 
     const download = (id) => {
+        closeMenu();
         const token = localStorage.getItem('token');
         if (!token) {
             alert('請先登入以下載檔案');

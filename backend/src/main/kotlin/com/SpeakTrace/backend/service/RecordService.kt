@@ -29,13 +29,11 @@ class RecordService(
         val dir = File("$uploadDir/$email")
         if (!dir.exists()) dir.mkdirs()
         val filepath = "$uploadDir/$email/$filename"
-        System.out.println("filename: $filename")
-        System.out.println("filepath: $filepath")
 
         // 儲存檔案到本地
         Files.copy(file.inputStream, Paths.get(filepath))
 
-        // 取得用戶（假設有方法根據 email 找到用戶）
+        // 取得用戶
         val user = userRepository.findByEmail(email) ?: throw IllegalArgumentException("用戶不存在")
 
         // 儲存到資料庫
@@ -82,13 +80,35 @@ class RecordService(
             }
 
             // 刪除本地檔案
-            val file = File(record.filePath)
-            if (file.exists()) {
-                if (!file.delete()) {
+            val recordFile = File(record.filePath)
+            val resultFile = File(record.filePath.toString().split(".").first() + ".txt")
+            if (recordFile.exists()) {
+                if (!recordFile.delete()) {
                     throw IllegalStateException("無法刪除檔案：${record.filePath}")
                 }
+                println("檔案已刪除：${record.filePath}")
+            }
+            if (resultFile.exists()) {
+                if (!resultFile.delete()) {
+                    throw IllegalStateException("無法刪除檔案：${resultFile.absolutePath}")
+                }
+                println("檔案已刪除：${resultFile.absolutePath}")
             }
         }
+        /*
+        // 刪除用戶目錄
+        val userDir = File("$uploadDir/$email")
+        if (userDir.exists() && userDir.isDirectory) {
+            val files = userDir.listFiles()
+            if (files == null || files.isEmpty()) {
+                if (!userDir.delete()) {
+                    throw IllegalStateException("無法刪除用戶目錄：${userDir.absolutePath}")
+                }
+                println("用戶目錄已刪除：${userDir.absolutePath}")
+            } else {
+                println("用戶目錄未刪除，因為目錄不為空：${userDir.absolutePath}")
+            }
+        } */
 
         // 從資料庫中刪除記錄
         uploadRecordRepository.deleteAll(records)

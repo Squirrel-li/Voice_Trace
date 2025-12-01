@@ -26,16 +26,14 @@ class RecordController(
         return try {
             val token = authHeader.removePrefix("Bearer ").trim()
             val email = jwtUtil.extractEmail(token)
-            
+
             // 儲存檔案並記錄到資料庫
             val record = recordService.saveRecord(file, email)
-            
-            ResponseEntity.ok(mapOf("message" to "影片已上傳", "recordId" to record.id))
+
+            ResponseEntity.ok(mapOf<String, Any>("message" to "影片已上傳", "recordId" to record.id))
         } catch (e: Exception) {
-            e.message?.let {
-                return ResponseEntity.badRequest().body(it)
-            }
-            return ResponseEntity.badRequest().body("伺服器錯誤")
+            e.printStackTrace() // 輸出完整的異常堆疊
+            ResponseEntity.badRequest().body(e.message ?: "伺服器錯誤")
         }
     }
 
@@ -102,4 +100,17 @@ class RecordController(
 			ResponseEntity.badRequest().body(mapOf("error" to e.message))
 		}
 	}
+}
+
+@RestControllerAdvice
+class GlobalExceptionHandler {
+
+    @ExceptionHandler(Exception::class)
+    fun handleException(e: Exception): ResponseEntity<Map<String, String>> {
+        // 記錄異常日誌
+        e.printStackTrace()
+
+        // 返回友好的錯誤訊息
+        return ResponseEntity.badRequest().body(mapOf("error" to "伺服器發生錯誤，請稍後再試"))
+    }
 }

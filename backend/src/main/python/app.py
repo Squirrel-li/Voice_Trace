@@ -41,13 +41,15 @@ def process_voice_trace(path_file_input, path_file_output, file_id):
 
         # 確保 results 是字串格式
         results = result_json["results"]
-        if isinstance(results, list):
-            results = json.dumps(results, ensure_ascii=False, indent=4)  # 將列表轉換為 JSON 字串
+        transcripts = ""
+        for result in results:
+            transcripts += f"{result.get('speaker', '')}: \t"
+            transcripts += f"{result.get('start', 0):.1f} - {result.get('end', 0):.1f} \t"
+            transcripts += f"{result.get('text', '')}\n"
 
         # 將結果寫入輸出檔案
         with open(path_file_output, "w", encoding="utf-8") as f:
-            f.write(results)  # 寫入字串
-
+            f.write(transcripts)  # 寫入字串
         print(f"處理完成，結果已寫入檔案：{path_file_output}")
 
         # 添加 file_id 到 result_json

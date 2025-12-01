@@ -6,8 +6,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference
 import com.fasterxml.jackson.annotation.JsonIgnore
 
 @Entity
-//@Table(name = "speaker_info")
-@JsonIgnoreProperties(value = ["hibernateLazyInitializer", "handler"])
+@Table(name = "speaker_info")
 data class SpeakerInfo(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -85,7 +85,8 @@
     };
     const fetchHistory = () => {
         const token = localStorage.getItem('token');
-        if (!token) {
+        
+        if (isLoggedIn.value && !token) {
             alert('請先登入以查看歷史紀錄');
             return;
         }

@@ -1,7 +1,8 @@
 package com.SpeakTrace.backend.model
 
 enum class RecordStatus {
-    PENDING,
+    PENDING,      // 修改為與資料庫一致
     PROCESSING,
-    COMPLETED
+    COMPLETED,
+    FAILED
 }
