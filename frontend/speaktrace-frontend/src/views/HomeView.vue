@@ -11,6 +11,7 @@
         <MainContent 
             @open-upload="openModal('upload')"
             @flash-history="fetchHistory"
+            @display-transcript="display"
             :uploadrecord="uploadrecord"
         />
 
@@ -38,6 +39,12 @@
                 v-if="activeModal === 'uploadUserinfo'"
                 @close="closeModal"
             />
+
+            <DisplayTranscriptModal
+                v-if="activeModal === 'displayTranscript'"
+                @close="closeModal"
+                :displayID="displayID"
+            />
         </teleport>
 
     </div>
@@ -51,11 +58,13 @@
     import RegisterModal from '../components/RegisterModal.vue';
     import UploadModal from '../components/UploadModal.vue';
     import UploadUserinfoModal from '../components/UploadUserinfoModal.vue';
+    import DisplayTranscriptModal from '../components/DisplayTranscriptModal.vue';
 
     // 狀態管理
     const isLoggedIn = ref(false); // 模擬登入狀態
     const activeModal = ref(null); // 當前開啟的彈窗 (null, 'login', 'register', 'upload', 'uploadUserinfo')
     const uploadrecord = ref([]); // 模擬歷史紀錄數據
+    const displayID = ref(null);
 
     let intervalId = null; // 定時器 ID
 
@@ -83,6 +92,7 @@
     const clearHistory = () => {
         uploadrecord.value = [];
     };
+
     const fetchHistory = () => {
         const token = localStorage.getItem('token');
         
@@ -103,7 +113,13 @@
         })
         .catch(error => {
             console.error('Error fetching history:', error);
+            isLoggedIn = false;
         });
+    };
+
+    const display = (data) => {
+        displayID.value = data;
+        openModal('displayTranscript');
     };
 
     // 啟動定時器

@@ -23,8 +23,8 @@ class SecurityConfig(
                     .requestMatchers(
                         "/index.html", "/", "/css/**", "/js/**", "/images/**", "/webjars/**"
                     ).permitAll() // 靜態資源與首頁允許
-                    //.requestMatchers("/api/auth/**", "/api/speech/**", "/api/test/**").permitAll() // 公開API
-                    .requestMatchers("/api/**").permitAll() // 公開API
+                    .requestMatchers("/api/auth/**", "/api/test/**", "/videos/**", "/api/speech/result").permitAll() // 公開API
+                    //.requestMatchers("/api/**").permitAll() // 公開API
                     .anyRequest().authenticated() // 其他都要驗證
             }
             .addFilterBefore(JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)

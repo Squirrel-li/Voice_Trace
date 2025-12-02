@@ -4,6 +4,8 @@ import com.SpeakTrace.backend.model.UploadRecord
 import com.SpeakTrace.backend.repository.UploadRecordRepository
 import com.SpeakTrace.backend.model.User // 假設 User 模型存在
 import com.SpeakTrace.backend.repository.UserRepository
+import com.SpeakTrace.backend.repository.TranscriptRepository
+import com.SpeakTrace.backend.repository.SpeakerInfoRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
@@ -14,8 +16,10 @@ import com.SpeakTrace.backend.model.RecordStatus
 
 @Service
 class RecordService(
+    private val transcriptRepository: TranscriptRepository,
+    private val userRepository: UserRepository,
     private val uploadRecordRepository: UploadRecordRepository,
-    private val userRepository: UserRepository // 假設有 UserRepository
+    private val speakerInfoRepository: SpeakerInfoRepository
 ) {
     private val uploadDir = "D:/!universitiy/3-1/ApplicationSoftwareDesignPractice/final_project/project_kotlin/database/upload_audio" // 本地資料夾路徑
 
@@ -79,6 +83,23 @@ class RecordService(
                 throw IllegalArgumentException("無權限刪除記錄 ID: ${record.id}")
             }
 
+            // 刪除與該記錄相關的 Transcript
+            val transcripts = transcriptRepository.findByUploadRecord_Id(record.id)
+            for (transcript in transcripts) {
+                val speakerInfo = transcript.speakerInfo
+
+                // 刪除 Transcript
+                transcriptRepository.delete(transcript)
+                println("已刪除 Transcript: ${transcript.id}")
+
+                // 檢查是否有其他 Transcript 引用該 SpeakerInfo
+                val remainingTranscripts = transcriptRepository.findBySpeakerInfo_Id(speakerInfo.id)
+                if (remainingTranscripts.isEmpty()) {
+                    speakerInfoRepository.delete(speakerInfo)
+                    println("已刪除孤立的 SpeakerInfo: ${speakerInfo.id}")
+                }
+            }
+
             // 刪除本地檔案
             val recordFile = File(record.filePath)
             val resultFile = File(record.filePath.toString().split(".").first() + ".txt")
@@ -95,26 +116,13 @@ class RecordService(
                 println("檔案已刪除：${resultFile.absolutePath}")
             }
         }
-        /*
-        // 刪除用戶目錄
-        val userDir = File("$uploadDir/$email")
-        if (userDir.exists() && userDir.isDirectory) {
-            val files = userDir.listFiles()
-            if (files == null || files.isEmpty()) {
-                if (!userDir.delete()) {
-                    throw IllegalStateException("無法刪除用戶目錄：${userDir.absolutePath}")
-                }
-                println("用戶目錄已刪除：${userDir.absolutePath}")
-            } else {
-                println("用戶目錄未刪除，因為目錄不為空：${userDir.absolutePath}")
-            }
-        } */
 
-        // 從資料庫中刪除記錄
+        // 從資料庫中刪除 UploadRecord
         uploadRecordRepository.deleteAll(records)
+        println("已刪除 UploadRecord: ${records.map { it.id }}")
     }
 
-    fun getRecordFile(recordId: Long, email: String): File {
+    fun getscriptsFile(recordId: Long, email: String): File {
         // 查詢 UploadRecord
         val uploadRecord = uploadRecordRepository.findByIdAndUserEmail(recordId, email)
             ?: throw IllegalArgumentException("找不到對應的 UploadRecord，recordId: $recordId，email: $email")
@@ -134,5 +142,62 @@ class RecordService(
         }
 
         return file
+    }
+
+    fun getDisplayData(displayID: Long, email: String): Map<String, Any> {
+        // 查詢資料庫，獲取影片檔案名稱
+        val uploadRecord = uploadRecordRepository.findByIdAndUserEmail(displayID, email)
+            ?: throw IllegalArgumentException("未找到對應的記錄")
+
+        val videoUrl = "http://localhost:8080/videos/$email/${uploadRecord.fileName}"
+
+        // 查詢 Transcript 資料
+        val transcriptList = transcriptRepository.findByUploadRecord_Id(displayID).map {
+            mapOf(
+                "speaker" to (it.speakerInfo.displayName ?: it.speakerInfo.speakerLabel), // 處理 displayName 為 null 的情況
+                "speakerID" to it.speakerInfo.id,
+                "time" to it.startTime,
+                "text" to it.textContent
+            )
+        }
+
+        return mapOf(
+            "uploadrecord" to mapOf("videoUrl" to videoUrl), // 影片 URL
+            "transcriptList" to transcriptList // 文本資訊
+        )
+    }
+
+    fun updateSpeakerLabel(speakerId: Long, email: String, newLabel: String) {
+        println("嘗試查找 speakerId: $speakerId")
+
+        // 查詢對應的 SpeakerInfo
+        val speakerInfoOptional = speakerInfoRepository.findById(speakerId)
+        if (speakerInfoOptional.isEmpty) {
+            throw IllegalArgumentException("找不到對應的 Speaker 資料，speakerId: $speakerId")
+        }
+        val speakerInfo = speakerInfoOptional.get()
+        println("找到的 SpeakerInfo: $speakerInfo")
+
+        // 查詢與 SpeakerInfo 關聯的 Transcript
+        val transcripts = transcriptRepository.findBySpeakerInfo_Id(speakerId)
+        if (transcripts.isEmpty()) {
+            throw IllegalArgumentException("找不到與該 Speaker 資料關聯的 Transcript，speakerId: $speakerId")
+        }
+        println("找到的 Transcripts: $transcripts")
+
+        // 驗證用戶是否有權限
+        val transcript = transcripts.first() // 假設所有關聯的 Transcript 都屬於同一用戶
+        if (transcript.uploadRecord.user.email != email) {
+            throw IllegalAccessException("無權限更新該 Speaker 的標籤")
+        }
+        println("驗證通過，原本的 SpeakerInfo: ${speakerInfo.displayName}")
+
+        // 更新 Speaker 的標籤
+        speakerInfo.displayName = newLabel
+        println("更新後的 SpeakerInfo: ${speakerInfo.displayName}")
+
+        // 保存更新後的 SpeakerInfo
+        speakerInfoRepository.save(speakerInfo)
+        println("Speaker 標籤更新成功")
     }
 }

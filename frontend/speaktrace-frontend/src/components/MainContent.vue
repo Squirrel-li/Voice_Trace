@@ -84,6 +84,7 @@
                                     v-if="activeMenuId === file.id"
                                     @transcribe="transcribe(file.id)"
                                     @download="download(file.id)"
+                                    @display-transcript="emit('displayTranscript', file.id)"
                                     @delete-file="deleteFile(file.id)"
                                     :file="file"
                                 />
@@ -114,7 +115,7 @@
         }
     });
 
-    const emit = defineEmits(['openUpload', 'flashHistory']);
+    const emit = defineEmits(['openUpload', 'flashHistory', 'displayTranscript']);
 
     const activeMenuId = ref(null);
     const selectedIds = ref([]);

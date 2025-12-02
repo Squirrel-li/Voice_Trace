@@ -1,15 +1,18 @@
 <template>
     <div
         class="dropdown-menu"
-        style="position: absolute; top: 30px; left: -35px; background: #fff; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 28px; z-index: 10; min-width: 100px; padding: 8px 0;"
+        style="position: absolute; top: 30px; left: -35px; background: #fff; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 28px; z-index: 10; min-width: 120px; padding: 8px 0;"
     >
-        <button @click="emit('transcribe')" v-if="file.status === 'PENDING'" class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
+        <button @click="emit('transcribe')" v-if="file.status === 'PENDING'" class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px; min-width: 90%;">
             <i style="margin-right: 8px; color: #374151; text-align: center;">轉錄</i>
         </button>
-        <button @click="emit('download')" v-else class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
+        <button @click="emit('download')" v-if="file.status !== 'PENDING'" class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px; min-width: 90%;">
             <i style="margin-right: 8px; color: #374151; text-align: center;">下載</i>
         </button>
-        <button @click="emit('deleteFile')" class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px;">
+        <button @click="emit('displayTranscript')" v-if="file.status !== 'PENDING'" class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px; min-width: 90%;">
+            <i style="margin-right: 8px; color: #374151; text-align: center;">對話查看</i>
+        </button>
+        <button @click="emit('deleteFile')" class="toolbar-btn menu-btn" style="padding: 8px 16px; cursor: pointer; margin: 5px 5px; min-width: 90%;">
             <i style="margin-right: 8px; color: #374151; text-align: center;">刪除</i>
         </button>
     </div>
@@ -17,11 +20,11 @@
 
 <script setup>
 	const props = defineProps({
-	file: {
-		type: Object,
-		required: true
-	}
+        file: {
+            type: Object,
+            required: true
+        }
 	});
 
-    const emit = defineEmits(['transcribe', 'download', 'deleteFile']);
+    const emit = defineEmits(['transcribe', 'download', 'displayTranscript', 'deleteFile']);
 </script>

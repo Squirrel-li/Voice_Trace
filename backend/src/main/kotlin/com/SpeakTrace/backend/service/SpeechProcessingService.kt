@@ -89,7 +89,8 @@ class SpeechProcessingService(
             for (speaker in results["speakers"] as List<*>) {
                 println("講者資訊: $speaker")
                 val speakerInfo = SpeakerInfo(
-                    speakerLabel = speaker.toString()
+                    speakerLabel = speaker.toString(),
+                    displayName = speaker.toString()
                 )
                 speakerInfoRepository.save(speakerInfo)
                 speakerInfoMap[speaker.toString()] = speakerInfo
