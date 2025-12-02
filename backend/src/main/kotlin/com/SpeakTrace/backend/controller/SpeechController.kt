@@ -1,109 +1,73 @@
 package com.SpeakTrace.backend.controller
 
-import org.springframework.web.bind.annotation.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.springframework.http.ResponseEntity
-import com.SpeakTrace.backend.service.callSpeechApi
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
+import org.springframework.web.bind.annotation.*
+import com.SpeakTrace.backend.util.JwtUtil
+import com.SpeakTrace.backend.service.SpeechProcessingService
 
-
-@RestController
-@RequestMapping("/api/speech")
-class SpeechController {
-    data class SpeechResult(val result: Any) // 用 Any 可接收 dict 或 string
-
-    @PostMapping("/result")
-    fun updateSpeechResult(@RequestBody req: SpeechResult): ResponseEntity<String> {
-        println("收到語音辨識結果: ${req.result}")
-        // TODO: 這裡可以更新資料庫或狀態
-        return ResponseEntity.ok("更新完成")
-    }
-}
-/*
-req.result = 
-{
-    speakers=
-    [
-        SPEAKER_01, 
-        SPEAKER_00
-    ], 
-    results=
-    [
-        {
-            speaker=SPEAKER_01, 
-            start=1.955, 
-            end=8.488, 
-            text= Dancing in the masquerade, idle truth and plain sight jaded, pop, roll, click, shot.
-        }, 
-        {
-            speaker=SPEAKER_01, 
-            start=8.508, 
-            end=10.452, 
-            text=Who will I be today or not?
-        }, 
-        {
-            speaker=SPEAKER_00, 
-            start=10.593, 
-            end=15.402, 
-            text=But such a tide as moving seems asleep, too full for sound and foam.
-        }, 
-        {
-            speaker=SPEAKER_00, 
-            start=15.422, 
-            end=22.056, 
-            text=When that which drew from out the boundless deep turns again home, twilight and evening bell and after that
-        }
-    ]
-}
-*/
-
-
-
-
-
-
-/* 
-data class SpeechRequest(
-    val path_file_input: String
+data class UploadRecordRequest(
+    val id: Long
 )
 
 @RestController
-@RequestMapping("/api")
-class SpeechController {
-
+@RequestMapping("/api/speech")
+class SpeechController(
+    private val jwtUtil: JwtUtil,
+    private val speechProcessingService: SpeechProcessingService
+) {
     @PostMapping("/tts")
-    fun tts(@RequestBody req: SpeechRequest) {
-        println("req: $req")
-        println("path_file_input: ${req.path_file_input}")
+    fun tts(
+        @RequestHeader("Authorization") authHeader: String,
+        @RequestBody request: UploadRecordRequest
+    ): ResponseEntity<Map<String, String>> {
+        try {
+            val uploadRecordId = request.id
+            val token = authHeader.removePrefix("Bearer ").trim()
+            val email = jwtUtil.extractEmail(token)
+            
 
-        val json = """
-            {
-                "path_file_input": "${req.path_file_input}"
+            // 使用協程進行非同步處理
+            CoroutineScope(Dispatchers.IO).launch {
+                speechProcessingService.callSpeechApi(email, uploadRecordId)
             }
-        """.trimIndent()
+    		return ResponseEntity.ok(mapOf("message" to "TTS 請求已發送"))
 
-        val client = OkHttpClient.Builder()
-            .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-            .readTimeout(120, java.util.concurrent.TimeUnit.SECONDS)
-            .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-            .build()
-        val requestBody = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-        System.out.println("requestBody: $requestBody")
-        val request = Request.Builder()
-            .url("http://127.0.0.1:5000/api/tts")
-            .post(requestBody)
-            .build()
-
-        client.newCall(request).execute().use { response ->
-            val result = if (response.isSuccessful) {
-                response.body?.string()
-            } else {
-                null
-            }
-            println("API 回傳結果：$result")
+        } catch (e: Exception) {
+            return ResponseEntity.badRequest().body(mapOf("error" to "發生錯誤: ${e.message}"))
         }
     }
+
+    @PostMapping("/result")
+    fun receiveResult(@RequestBody result: Map<String, Any>): ResponseEntity<String> {
+        try {
+            println("收到 Flask 的結果: $result")
+
+            // 提取 result 和 file_id
+            val resultData = result["results"] ?: return ResponseEntity.badRequest().body("缺少結果")
+            val fileId = result["file_id"] ?: return ResponseEntity.badRequest().body("缺少 file_id")
+            // 處理結果，例如存入資料庫
+            println("處理結果: $resultData, 檔案 ID: $fileId")
+
+            // 根據需求進行進一步處理
+            speechProcessingService.uploadSpeechResult(result)
+
+            return ResponseEntity.ok("結果已成功接收")
+        } catch (e: Exception) {
+            return ResponseEntity.badRequest().body("發生錯誤: ${e.message}")
+        }
+    }
+}
+/*
+{result=
+{
+    speakers=[SPEAKER_01, SPEAKER_00], 
+    results=[   {speaker=SPEAKER_01, start=1.955, end=8.488, text= Dancing in the masquerade, idle truth and plain sight jaded, pop, roll, click, shot.}, 
+                {speaker=SPEAKER_01, start=8.508, end=10.452, text=Who will I be today or not?}, 
+                {speaker=SPEAKER_00, start=10.593, end=15.402, text=But such a tide as moving seems asleep, too full for sound and foam.}, 
+                {speaker=SPEAKER_00, start=15.422, end=22.056, text=When that which drew from out the boundless deep turns again home, twilight and evening bell and after that}]}, 
+    file_id=15
 }
 */

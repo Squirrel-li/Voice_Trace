@@ -36,7 +36,7 @@ const handleUploadUserinfo = async () => {
         const token = localStorage.getItem('token');
         
         if (!token) {
-                alert('請先登入');
+                alert('請重新登入');
                 return;
         }
 

@@ -1,0 +1,4 @@
+SPEAKER_01: 	2.0 - 8.5 	 Dancing in the masquerade, idle truth and plain sight jaded, pop, roll, click, shot.
+SPEAKER_01: 	8.5 - 10.5 	Who will I be today or not?
+SPEAKER_00: 	10.6 - 15.4 	But such a tide as moving seems asleep, too full for sound and foam.
+SPEAKER_00: 	15.4 - 22.1 	When that which drew from out the boundless deep turns again home, twilight and evening bell and after that

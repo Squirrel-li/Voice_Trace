@@ -53,6 +53,7 @@ backend/token.txt
 **/token.txt
 **/api_key.txt
 /backend/secretKey/secret.key
+/backend/secret.key
 
 .venv
 node_modules

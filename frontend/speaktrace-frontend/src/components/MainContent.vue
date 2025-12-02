@@ -44,7 +44,7 @@
                     </div>
                 </div>
                 <div class="file-col file-col-name file-col-name-header">名稱</div>
-                <div class="file-col file-col-len">語言</div>
+                <!--<div class="file-col file-col-len">語言</div>-->
                 <div class="file-col file-col-status">狀態</div>
                 <div class="file-col file-col-more"></div>
                 </div>
@@ -65,10 +65,10 @@
                                 <span class="file-row-name-text">{{ file.filename }}</span>
                                 <span v-if="file.time" class="file-row-name-date">| {{ file.time }}</span>
                             </td>
-                            <td class="file-col file-col-len file-row-len" style="margin-left: 10px;">
+                            <!--<td class="file-col file-col-len file-row-len" style="margin-left: 10px;">
                                 <span class="file-row-len-text">{{ file.language || '中文' }}</span>
-                            </td>
-                            <td class="file-col file-col-status file-row-status" style="margin-right: -40px;">
+                            </td>-->
+                            <td class="file-col file-col-status file-row-status" style="min-width: 10%;">
                                 <span class="file-row-status-dot"
                                     :style="{ backgroundColor: file.statusColor || '#16a34a' }"></span>
                                 <span class="file-row-status-text">{{ file.status || '完成' }}</span>
@@ -80,8 +80,12 @@
                                     @click="openMenu(file.id)"
                                 ></i>
                                 <!-- 小選單 -->
-                                <actionMenu 
+                                <actionMenuModal 
                                     v-if="activeMenuId === file.id"
+                                    @transcribe="transcribe(file.id)"
+                                    @download="download(file.id)"
+                                    @display-transcript="emit('displayTranscript', file.id)"
+                                    @delete-file="deleteFile(file.id)"
                                     :file="file"
                                 />
                             </td>
@@ -102,7 +106,7 @@
 
 <script setup>
     import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
-    import actionMenu  from '../components/actionMenu.vue';
+    import actionMenuModal  from "./ActionMenuModal.vue";
 
     const props = defineProps({
         uploadrecord: {
@@ -111,10 +115,44 @@
         }
     });
 
-    const emit = defineEmits(['openUpload', 'flashHistory']);
+    const emit = defineEmits(['openUpload', 'flashHistory', 'displayTranscript']);
 
     const activeMenuId = ref(null);
     const selectedIds = ref([]);
+
+    const transcribe = (id) => {
+        closeMenu();
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('請先登入以進行轉錄');
+            return;
+        }
+
+        console.log('取得 token:', token);
+        console.log('開始轉錄，檔案ID:', id);
+
+        fetch('/api/speech/tts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('轉錄成功:', data);
+            emit('flashHistory');
+        })
+        .catch(error => {
+            alert(error.message || '轉錄失敗，請稍後再試。');
+        });
+    };
 
     // 全選 checkbox 狀態
     const allSelected = computed(() => 
@@ -130,6 +168,47 @@
         selectedIds.value = props.uploadrecord.map(file => file.id);
     }
     };
+
+    const download = (id) => {
+        closeMenu();
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('請先登入以下載檔案');
+            return;
+        }
+
+        fetch(`/api/record/download?id=${id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `record_${id}.txt`; // 可根據需要修改檔名
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            alert(error.message || '下載失敗，請稍後再試。');
+        });
+    };
+
+
+    const deleteFile = (id) => {
+        selectedIds.value = [id];
+        deleteSelected();
+    }
 
     const deleteSelected = () => {
         if (selectedIds.value.length === 0) {

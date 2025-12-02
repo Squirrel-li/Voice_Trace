@@ -24,6 +24,10 @@ data class User(
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JsonIgnore // 避免序列化循環，如需回傳可移除
-    var uploadRecords: MutableList<UploadRecord> = mutableListOf()
-)
+    @JsonIgnore
+    val uploadRecords: MutableList<UploadRecord> = mutableListOf()
+) {
+    override fun toString(): String {
+        return "User(id=$id, email='$email')"
+    }
+}
