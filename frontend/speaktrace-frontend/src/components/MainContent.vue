@@ -22,7 +22,18 @@
                     <span>最近的文件</span>
                 </div>
                 <div class="content-header-right">
-                    <!--<button class="icon-btn" aria-label="搜尋" @click="openSearchModal">🔍</button>-->
+                    <template v-if="isSearchActive">
+                        <input 
+                            type="text" 
+                            class="search-input" 
+                            v-model="searchQuery" 
+                            placeholder="輸入關鍵字搜尋" 
+                        />
+                        <button class="toolbar-btn" @click="isSearchActive = false">❌</button>
+                    </template>
+                    <template v-else>
+                        <button class="icon-btn" aria-label="搜尋" @click="isSearchActive = true">🔍</button>
+                    </template>
                     <button class="toolbar-btn" @click="$emit('openUpload')">⬆️ 上傳語音檔</button>
                 </div>
             </div>
@@ -51,7 +62,7 @@
             
                 <table class="file-table">
                     <tbody id="file-list-body">
-                        <tr v-for="file in props.uploadrecord" :key="file.id" class="file-row file-row-body">
+                        <tr v-for="file in filteredRecords" :key="file.id" class="file-row file-row-body">
                             <td class="file-col file-col-checkbox file-row-checkbox" style="margin-left: 0.5%;">
                                 <input
                                     type="checkbox"
@@ -119,6 +130,17 @@
 
     const activeMenuId = ref(null);
     const selectedIds = ref([]);
+    const isSearchActive = ref(false); // 控制搜尋狀態
+    const searchQuery = ref(''); // 搜尋關鍵字
+
+    const filteredRecords = computed(() => {
+        if (!searchQuery.value.trim()) {
+            return props.uploadrecord; // 如果搜尋框為空，顯示所有檔案
+        }
+        return props.uploadrecord.filter(file =>
+            file.filename.toLowerCase().includes(searchQuery.value.toLowerCase()) // 篩選檔案名稱包含搜尋關鍵字的檔案
+        );
+    });
 
     const transcribe = (id) => {
         closeMenu();
@@ -255,6 +277,13 @@
         activeMenuId.value = null;
     };
 
+    const openSearchModal = () => {
+        const query = prompt('請輸入搜尋關鍵字'); // 彈出搜尋框
+        if (query !== null) {
+            searchQuery.value = query; // 更新搜尋關鍵字
+        }
+    };
+
     // 點擊外部關閉選單
     const handleClickOutside = (event) => {
         // 判斷點擊是否在選單或 ⋯ 按鈕上
@@ -297,5 +326,48 @@
     height: 1px;
     background: #eee;
     margin: 4px 0;
+}
+.search-input {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px;
+    margin-right: 10px;
+    transition: border-color 0.2s;
+}
+
+.search-input:focus {
+    border-color: #1677ff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(22, 119, 255, 0.5);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    transition: transform 0.2s;
+}
+
+.icon-btn:hover {
+    transform: scale(1.1); /* 放大效果 */
+}
+
+.toolbar-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    background-color: #1677ff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.toolbar-btn:hover {
+    background-color: #125bcc;
 }
 </style>
