@@ -74,7 +74,11 @@
     };
 
     const closeModal = () => {
-        activeModal.value = null;
+        if (!isLoggedIn.value && (activeModal.value === 'login' || activeModal.value === 'register')) {
+            return;
+        } else {
+            activeModal.value = null;
+        }
     };
 
     // 登入成功處理
@@ -86,7 +90,12 @@
 
     const logout = () => {
         isLoggedIn.value = false;
+        if (intervalId) 
+        {
+            clearInterval(intervalId);
+        }
         clearHistory();
+        openModal('login'); // 強制回到登入畫面
     };
 
     const clearHistory = () => {
@@ -95,8 +104,10 @@
 
     const fetchHistory = () => {
         const token = localStorage.getItem('token');
+        console.log('Fetching history with token:', token);
+        console.log('isLoggedIn:', isLoggedIn.value);
         
-        if (isLoggedIn.value && !token) {
+        if (!isLoggedIn.value || !token) {
             alert('請先登入以查看歷史紀錄');
             return;
         }
@@ -113,7 +124,11 @@
         })
         .catch(error => {
             console.error('Error fetching history:', error);
-            isLoggedIn = false;
+            isLoggedIn.value = false;
+            if (intervalId) 
+            {
+                clearInterval(intervalId);
+            }
         });
     };
 
@@ -124,7 +139,14 @@
 
     // 啟動定時器
     onMounted(() => {
-        intervalId = setInterval(fetchHistory, 5000); // 每 5 秒執行一次 fetchHistory
+        const token = localStorage.getItem('token');
+        if (!token) {
+            openModal('login'); // 強制顯示登入畫面
+        } else {
+            isLoggedIn.value = true;
+            fetchHistory();
+            intervalId = setInterval(fetchHistory, 5000); // 每 5 秒執行一次 fetchHistory
+        }
     });
 
     // 清除定時器
